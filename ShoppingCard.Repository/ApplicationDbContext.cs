@@ -27,6 +27,7 @@ namespace ShoppingCard.Repository
             base.OnModelCreating(modelBuilder);
 
             modelBuilder.ApplyConfiguration(new BasketProductConfiguration());
+            modelBuilder.ApplyConfiguration(new BasketConfiguration());
 
         }
     }

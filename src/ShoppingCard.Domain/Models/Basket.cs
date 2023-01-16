@@ -22,7 +22,7 @@ namespace ShoppingCard.Domain.Models
         /// using for the confirmed payment for the basket
         /// </summary>
         [NotMapped]
-        public Payment ConfirmedPayment => Payments.Single(x => x.IsConfirmed);
+        public Payment? ConfirmedPayment => Payments?.Single(x => x.IsConfirmed);
 
         /// <summary>
         /// using for many to many relationship between basket and product
@@ -33,7 +33,7 @@ namespace ShoppingCard.Domain.Models
         /// getting whole price after the task been calculated
         /// </summary>
         [NotMapped]
-        public decimal FinalPrice => BasketProducts.ToList().Sum(x => x.BasketProductPrice) * (decimal)1.09;
+        public decimal? FinalPrice => BasketProducts?.ToList().Sum(x => x.BasketProductPrice) * (decimal)1.09;
     }
 
 }

@@ -7,6 +7,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Common.ModelConfigurations;
+using Microsoft.EntityFrameworkCore;
 
 namespace ShoppingCard.Repository.EntityConfigurations
 {
@@ -14,9 +15,11 @@ namespace ShoppingCard.Repository.EntityConfigurations
     {
         public override void DerivedConfigure(EntityTypeBuilder<Basket> builder)
         {
+            builder.Property(x => x.Version);
             builder.HasMany(x => x.Payments)
                 .WithOne(x => x.Basket)
-                .HasForeignKey(x => x.BasketId);
+                .HasForeignKey(x => x.BasketId)
+                .OnDelete(DeleteBehavior.Restrict);
         }
     }
 }

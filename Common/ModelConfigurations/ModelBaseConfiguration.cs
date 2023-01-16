@@ -20,9 +20,10 @@ namespace Common.ModelConfigurations
             builder.HasKey(x => x.Id);
             builder.Property(x => x.Id).IsRequired().ValueGeneratedNever();
 
-            builder.Property(x => x.RowVersion).IsRowVersion();
+            builder.Property(x => x.Version).IsRowVersion();
 
             builder.Property(x => x.IsDeleted).HasDefaultValue(false);
+            builder.HasQueryFilter(x => (!x.IsDeleted));
 
             builder.Property(x => x.CreatedAt).ValueGeneratedOnAdd().HasDefaultValueSql("NOW()");
 

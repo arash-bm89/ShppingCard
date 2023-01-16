@@ -1,5 +1,12 @@
+using Common.Implementations;
+using Common.Interfaces;
 using Microsoft.EntityFrameworkCore;
+using ShoppingCard.Api.Configurations;
+using ShoppingCard.Api.ExtensionMethods;
+using ShoppingCard.Domain.Interfaces;
+using ShoppingCard.Domain.Models;
 using ShoppingCard.Repository;
+using ShoppingCard.Repository.Implementations;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -11,10 +18,13 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
 // Add DbContext to the application
-builder.Services.AddDbContext<ApplicationDbContext>(options =>
-{
-    options.UseNpgsql(builder.Configuration.GetConnectionString("basketDb"));
-});
+builder.Services.AddApplicationDbContext(builder.Configuration);
+
+// Add Repository services
+builder.Services.AddRepositories();
+
+// Add AutoMapper service
+builder.Services.AddAutoMapper(typeof(AutoMapperConfiguration));
 
 var app = builder.Build();
 
