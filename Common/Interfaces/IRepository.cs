@@ -8,14 +8,24 @@ using Common.Models;
 
 namespace Common.Interfaces
 {
-    public interface IRepository<TModel> where TModel : ModelBase
+    // todo: findout what in means in c#?
+    // todo: why tfilter is a struct?
+
+    public interface IRepository<TModel, in TFilter> 
+        where TModel : ModelBase
+        where TFilter : struct, IListFilter
     {
         #region AsyncMethods
 
-        Task<TModel> GetByIdAsync(Guid id, CancellationToken cancellationToken);
-        Task<TModel> GetBySeqIdAsync(uint seqId, CancellationToken cancellationToken);
-        Task<List<TModel>> GetAllAsync(CancellationToken cancellationToken);
-        Task<List<TModel>> GetByFilterAsync(Expression<Func<TModel, bool>> filter, CancellationToken cancellationToken);
+        Task<TModel?> GetByIdAsync(Guid id, CancellationToken cancellationToken);
+        Task<TModel?> GetByIdWithoutIncludeAsync(Guid id, CancellationToken cancellationToken);
+
+        Task<TModel?> GetBySeqIdAsync(uint seqId, CancellationToken cancellationToken);
+        Task<TModel?> GetBySeqIdWithoutIncludeAsync(uint seqId, CancellationToken cancellationToken);
+
+        Task<PaginatedResult<TModel>> GetListAsync(TFilter filter, CancellationToken cancellationToken);
+        Task<List<TModel>?> GetAllAsync(CancellationToken cancellationToken);
+        Task<List<TModel>?> GetByFilterAsync(Expression<Func<TModel, bool>> filter, CancellationToken cancellationToken);
         Task CreateAsync(TModel model, CancellationToken cancellationToken);
         Task CreateRangeAsync(List<TModel> models, CancellationToken cancellationToken);
         Task UpdateAsync(TModel model, CancellationToken cancellationToken);
@@ -24,6 +34,7 @@ namespace Common.Interfaces
         Task DeleteByIdAsync(Guid id, CancellationToken cancellationToken);
         Task DeleteBySeqIdAsync(uint seqId, CancellationToken cancellationToken);
         Task DeleteRangeAsync(List<TModel> models, CancellationToken cancellationToken);
+        
 
         #endregion
 

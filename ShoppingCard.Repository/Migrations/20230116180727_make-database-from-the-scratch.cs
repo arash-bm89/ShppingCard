@@ -7,7 +7,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace ShoppingCard.Repository.Migrations
 {
     /// <inheritdoc />
-    public partial class addtables : Migration
+    public partial class makedatabasefromthescratch : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -17,10 +17,11 @@ namespace ShoppingCard.Repository.Migrations
                 columns: table => new
                 {
                     Id = table.Column<Guid>(type: "uuid", nullable: false),
-                    SeqId = table.Column<int>(type: "integer", nullable: false),
-                    RowVersion = table.Column<long>(type: "bigint", nullable: false),
-                    IsDeleted = table.Column<bool>(type: "boolean", nullable: false),
-                    CreatedAt = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: false),
+                    SeqId = table.Column<long>(type: "bigint", nullable: false)
+                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
+                    xmin = table.Column<uint>(type: "xid", rowVersion: true, nullable: false),
+                    IsDeleted = table.Column<bool>(type: "boolean", nullable: false, defaultValue: false),
+                    CreatedAt = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: false, defaultValueSql: "NOW()"),
                     ModifiedAt = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: true),
                     DeletedAt = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: true)
                 },
@@ -39,10 +40,11 @@ namespace ShoppingCard.Repository.Migrations
                     Description = table.Column<string>(type: "character varying(300)", maxLength: 300, nullable: false),
                     NumberOfAvailable = table.Column<long>(type: "bigint", nullable: false),
                     ImageUrl = table.Column<string>(type: "character varying(100)", maxLength: 100, nullable: false),
-                    SeqId = table.Column<int>(type: "integer", nullable: false),
-                    RowVersion = table.Column<long>(type: "bigint", nullable: false),
-                    IsDeleted = table.Column<bool>(type: "boolean", nullable: false),
-                    CreatedAt = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: false),
+                    SeqId = table.Column<long>(type: "bigint", nullable: false)
+                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
+                    xmin = table.Column<uint>(type: "xid", rowVersion: true, nullable: false),
+                    IsDeleted = table.Column<bool>(type: "boolean", nullable: false, defaultValue: false),
+                    CreatedAt = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: false, defaultValueSql: "NOW()"),
                     ModifiedAt = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: true),
                     DeletedAt = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: true)
                 },
@@ -60,10 +62,11 @@ namespace ShoppingCard.Repository.Migrations
                     IsConfirmed = table.Column<bool>(type: "boolean", nullable: false),
                     ConfirmedAt = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: false),
                     DeliveryAt = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: false),
-                    SeqId = table.Column<int>(type: "integer", nullable: false),
-                    RowVersion = table.Column<long>(type: "bigint", nullable: false),
-                    IsDeleted = table.Column<bool>(type: "boolean", nullable: false),
-                    CreatedAt = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: false),
+                    SeqId = table.Column<long>(type: "bigint", nullable: false)
+                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
+                    xmin = table.Column<uint>(type: "xid", rowVersion: true, nullable: false),
+                    IsDeleted = table.Column<bool>(type: "boolean", nullable: false, defaultValue: false),
+                    CreatedAt = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: false, defaultValueSql: "NOW()"),
                     ModifiedAt = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: true),
                     DeletedAt = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: true)
                 },
@@ -75,7 +78,7 @@ namespace ShoppingCard.Repository.Migrations
                         column: x => x.BasketId,
                         principalTable: "Baskets",
                         principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
+                        onDelete: ReferentialAction.Restrict);
                 });
 
             migrationBuilder.CreateTable(
@@ -86,10 +89,10 @@ namespace ShoppingCard.Repository.Migrations
                     BasketId = table.Column<Guid>(type: "uuid", nullable: false),
                     ProductId = table.Column<Guid>(type: "uuid", nullable: false),
                     CountOfProduct = table.Column<long>(type: "bigint", nullable: false),
-                    SeqId = table.Column<int>(type: "integer", nullable: false)
+                    SeqId = table.Column<long>(type: "bigint", nullable: false)
                         .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
                     xmin = table.Column<uint>(type: "xid", rowVersion: true, nullable: false),
-                    IsDeleted = table.Column<bool>(type: "boolean", nullable: false, defaultValue: true),
+                    IsDeleted = table.Column<bool>(type: "boolean", nullable: false, defaultValue: false),
                     CreatedAt = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: false, defaultValueSql: "NOW()"),
                     ModifiedAt = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: true),
                     DeletedAt = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: true)
@@ -102,13 +105,13 @@ namespace ShoppingCard.Repository.Migrations
                         column: x => x.BasketId,
                         principalTable: "Baskets",
                         principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
+                        onDelete: ReferentialAction.Restrict);
                     table.ForeignKey(
                         name: "FK_BasketProducts_Products_ProductId",
                         column: x => x.ProductId,
                         principalTable: "Products",
                         principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
+                        onDelete: ReferentialAction.Restrict);
                 });
 
             migrationBuilder.CreateIndex(
@@ -128,9 +131,27 @@ namespace ShoppingCard.Repository.Migrations
                 unique: true);
 
             migrationBuilder.CreateIndex(
+                name: "IX_Baskets_SeqId",
+                table: "Baskets",
+                column: "SeqId",
+                unique: true);
+
+            migrationBuilder.CreateIndex(
                 name: "IX_Payments_BasketId",
                 table: "Payments",
                 column: "BasketId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Payments_SeqId",
+                table: "Payments",
+                column: "SeqId",
+                unique: true);
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Products_SeqId",
+                table: "Products",
+                column: "SeqId",
+                unique: true);
         }
 
         /// <inheritdoc />

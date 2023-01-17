@@ -22,12 +22,16 @@ namespace ShoppingCard.Repository
 
         }
 
+        protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
+            => optionsBuilder.LogTo(Console.WriteLine);
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
 
             modelBuilder.ApplyConfiguration(new BasketProductConfiguration());
             modelBuilder.ApplyConfiguration(new BasketConfiguration());
+            modelBuilder.ApplyConfiguration(new ProductConfiguration());
+            modelBuilder.ApplyConfiguration(new PaymentConfiguration());
 
         }
     }

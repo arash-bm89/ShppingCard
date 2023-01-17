@@ -13,7 +13,7 @@ namespace Common.ModelConfigurations
     {
         public void Configure(EntityTypeBuilder<TEntity> builder)
         {
-            
+            //builder.Property(x => x.Version).HasColumnName("Version");
             builder.HasIndex(x => x.SeqId).IsUnique(true);
             builder.Property(x => x.SeqId).UseIdentityColumn().ValueGeneratedOnAdd();
 

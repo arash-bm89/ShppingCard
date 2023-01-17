@@ -4,6 +4,5 @@ namespace ShoppingCard.Api.Controllers
 {
     public class BaseController: ControllerBase
     {
-        public CancellationToken RequestAbborted { get; set; }
     }
 }

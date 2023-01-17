@@ -9,7 +9,8 @@ using ShoppingCard.Domain.Models;
 
 namespace ShoppingCard.Domain.Interfaces
 {
-    public interface IBasketRepository: IRepository<Basket, BasketFilter>
+    public interface IProductRepository: IRepository<Product, ProductFilter>
     {
+
     }
 }

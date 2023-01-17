@@ -18,6 +18,8 @@ namespace ShoppingCard.Api.ExtensionMethods
         public static void AddRepositories(this IServiceCollection services)
         {
             services.AddScoped<IBasketRepository, BasketRepository>();
+            services.AddScoped<IProductRepository, ProductRepository>();
+            services.AddScoped<IBasketProductRepository, BasketProductRepository>();
         }
 
     }

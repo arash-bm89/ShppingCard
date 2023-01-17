@@ -40,6 +40,7 @@ namespace ShoppingCard.Domain.Models
         /// <summary>
         /// using for many to many relationship between basket and product
         /// </summary>
+        
         public ICollection<BasketProduct> BasketProducts { get; set; }
     }
 

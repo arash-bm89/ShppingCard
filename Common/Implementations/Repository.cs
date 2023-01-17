@@ -4,19 +4,26 @@ using System.Linq;
 using System.Linq.Expressions;
 using System.Text;
 using System.Threading.Tasks;
+using Common.ExtensionMethods;
 using Common.Interfaces;
 using Common.Models;
 using Microsoft.EntityFrameworkCore;
 
 namespace Common.Implementations
 {
-    public abstract class Repository<TModelBase>: IRepository<TModelBase> where TModelBase : ModelBase
+    public abstract class Repository<TModelBase, TFilter>: IRepository<TModelBase, TFilter> 
+        where TModelBase : ModelBase
+        where TFilter : struct, IListFilter
     {
         // for now repository implemented using eager loading
 
         // todo: ask about eager one and implement the class using this pattern
         // todo: ask about filter & pagination
         // todo: see the pagination section of the course
+
+        // todo: is it better to handle notfound element in db inside the application or inside the stack?
+
+        // todo: differences of configureInclude and ConfigureListInclude
 
 
         #region Properties
@@ -40,27 +47,63 @@ namespace Common.Implementations
 
         protected abstract IQueryable<TModelBase> ConfigureInclude(IQueryable<TModelBase> query);
         protected abstract IQueryable<TModelBase> ConfigureListInclude(IQueryable<TModelBase> query);
+        protected abstract IQueryable<TModelBase> ApplyFilter(IQueryable<TModelBase> query, TFilter filter);
 
         #endregion
 
         #region InterfaceImplementations
 
-        public virtual async Task<TModelBase> GetByIdAsync(Guid id, CancellationToken cancellationToken)
+        public virtual async Task<TModelBase?> GetByIdAsync(Guid id, CancellationToken cancellationToken)
         {
-            return await _dbSet.AsNoTracking().SingleAsync(x => x.Id == id, cancellationToken);
+            // todo: ask what the hell is this?!
+            return await _dbSet.Apply<TModelBase, TModelBase>(new Func<IQueryable<TModelBase>, IQueryable<TModelBase>>(this.ConfigureInclude))
+                .AsNoTracking().FirstOrDefaultAsync(x => x.Id == id, cancellationToken);
         }
 
-        public virtual async Task<TModelBase> GetBySeqIdAsync(uint seqId, CancellationToken cancellationToken)
+        public virtual async Task<TModelBase?> GetBySeqIdAsync(uint seqId, CancellationToken cancellationToken)
         {
-            return await _dbSet.AsNoTracking().SingleAsync(x => x.SeqId == seqId, cancellationToken);
+            return await _dbSet.Apply<TModelBase, TModelBase>(new Func<IQueryable<TModelBase>, IQueryable<TModelBase>>(this.ConfigureInclude))
+                .AsNoTracking().FirstOrDefaultAsync(x => x.SeqId == seqId, cancellationToken);
         }
 
-        public virtual async Task<List<TModelBase>> GetAllAsync(CancellationToken cancellationToken)
+        public virtual async Task<TModelBase?> GetByIdWithoutIncludeAsync(Guid id, CancellationToken cancellationToken)
         {
-            return await _dbSet.AsNoTracking().ToListAsync(cancellationToken);
+            // todo: ask what the hell is this?!
+            return await _dbSet.AsNoTracking().FirstOrDefaultAsync(x => x.Id == id, cancellationToken);
         }
 
-        public virtual async Task<List<TModelBase>> GetByFilterAsync(Expression<Func<TModelBase, bool>> filter, CancellationToken cancellationToken)
+        public virtual async Task<TModelBase?> GetBySeqIdWithoutIncludeAsync(uint seqId, CancellationToken cancellationToken)
+        {
+            return await _dbSet.AsNoTracking().FirstOrDefaultAsync(x => x.SeqId == seqId, cancellationToken);
+        }
+
+        public async Task<PaginatedResult<TModelBase>> GetListAsync(TFilter filter, CancellationToken cancellationToken)
+        {
+            var query = _dbSet.AsQueryable();
+            query = this.ApplyFilter(query, filter);
+
+            PaginatedResult<TModelBase> paginatedResult = new PaginatedResult<TModelBase>();
+            paginatedResult.Items = await _dbSet
+                .AsNoTracking()
+                .Apply(this.ConfigureListInclude)
+                .Skip(filter.Offset)
+                .Take(filter.Count)
+                .ToListAsync(cancellationToken);
+            paginatedResult.TotalCount = await _dbSet.CountAsync(cancellationToken);
+            
+            return paginatedResult;
+        }
+
+
+        public virtual async Task<List<TModelBase>?> GetAllAsync(CancellationToken cancellationToken)
+        {
+            return await _dbSet.Apply<TModelBase, TModelBase>(new Func<IQueryable<TModelBase>, IQueryable<TModelBase>>(this.ConfigureInclude))
+                .AsNoTracking().ToListAsync(cancellationToken);
+        }
+
+
+        [Obsolete]
+        public virtual async Task<List<TModelBase>?> GetByFilterAsync(Expression<Func<TModelBase, bool>> filter, CancellationToken cancellationToken)
         {
             return await _dbSet.AsNoTracking().Where(filter).ToListAsync(cancellationToken);
         }
@@ -79,12 +122,17 @@ namespace Common.Implementations
 
         public virtual async Task UpdateAsync(TModelBase model, CancellationToken cancellationToken)
         {
+            model.ModifiedAt = DateTimeOffset.Now;
             _dbSet.Update(model);
             await SaveChangesAsync(cancellationToken);
         }
 
         public virtual async Task UpdateRangeAsync(List<TModelBase> models, CancellationToken cancellationToken)
         {
+            foreach (TModelBase modelBase in models)
+            {
+                modelBase.ModifiedAt = DateTimeOffset.Now;
+            }
             _dbSet.UpdateRange(models);
             await SaveChangesAsync(cancellationToken);
         }
@@ -123,7 +171,7 @@ namespace Common.Implementations
         protected virtual void PerformDeleteWithoutSaving(TModelBase modelBase)
         {
             modelBase.IsDeleted = true;
-            modelBase.DeletedAt = DateTimeOffset.Now;
+            modelBase.DeletedAt = DateTimeOffset.UtcNow;
 
             var efEntry = _db.Entry(modelBase);
 
