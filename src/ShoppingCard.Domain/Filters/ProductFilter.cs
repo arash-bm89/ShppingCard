@@ -10,7 +10,6 @@ using Common.Models;
 
 namespace ShoppingCard.Domain.Filters
 {
-    // todo: testing autoMapper to check if is it possible to convert class to a struct? if be convert classFilters(filling by user) to generate filters. 
     public struct ProductFilter : IListFilter
     {
         [DefaultValue(0)]

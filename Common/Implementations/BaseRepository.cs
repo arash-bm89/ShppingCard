@@ -19,7 +19,6 @@ namespace Common.Implementations
 
         // todo: implement setupPaging
 
-        // todo: is it better to handle notfound element in db inside the application or inside the stack?
 
 
         #region Properties
@@ -51,7 +50,6 @@ namespace Common.Implementations
 
         public virtual async Task<TModelBase?> GetAsync(Guid id, CancellationToken cancellationToken)
         {
-            // todo: ask what the hell is this?!
             return await _dbSet
                 .Apply(ConfigureInclude)
                 .AsNoTracking()
@@ -82,7 +80,6 @@ namespace Common.Implementations
 
         public async Task<PaginatedResult<TModelBase>> GetListAsync(TFilter filter, CancellationToken cancellationToken)
         {
-            // todo: debug using console tab that how isAvailable will querying to the database
             var query = _dbSet.AsQueryable();
 
             query = ApplyFilter(query, filter);
@@ -173,7 +170,6 @@ namespace Common.Implementations
 
         public virtual async Task DeleteAsync(Guid id, CancellationToken cancellationToken)
         {
-            // todo: implementing exceptionMiddleware
             var model = await GetAsync(id, cancellationToken);
 
             if (model == null)

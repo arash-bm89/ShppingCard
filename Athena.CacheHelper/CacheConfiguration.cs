@@ -4,12 +4,10 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Common.Models
+namespace Athena.CacheHelper
 {
-    public interface IListFilter
+    public class  CacheConfiguration
     {
-        int Offset { get; set; }
-        int Count { get; set; }
-
+        public string Prefix { get; set; } = "";
     }
 }

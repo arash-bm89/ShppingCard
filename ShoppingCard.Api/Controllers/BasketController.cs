@@ -2,8 +2,10 @@
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Net;
 using System.Runtime.CompilerServices;
+using Athena.CacheHelper;
 using AutoMapper;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Core.Infrastructure;
 using Microsoft.AspNetCore.Mvc.Infrastructure;
 using Microsoft.EntityFrameworkCore;
 using ShoppingCard.Api.Models;
@@ -15,31 +17,30 @@ using BasketProduct = ShoppingCard.Domain.Models.BasketProduct;
 
 namespace ShoppingCard.Api.Controllers
 {
-    // todo: ask if should i implement every crud actions of a controller
-    // todo: ask if how controller property is going to use for each request. i have tested it for a number
-    // and looks like it uses just one controller for every request in the application. 
-    // so how requestAborted is going to work for each one right?
 
     /// <summary>
     /// using for actions of final basketRepository
     /// </summary>
     [ApiController]
-    [Route("api/baskets")]
+    [Route("baskets")]
     public class BasketController: BaseController
     {
         private readonly IBasketRepository _basketRepository;
         private readonly IBasketProductRepository _basketProductRepository;
         private readonly IMapper _mapper;
 
-        public BasketController(IBasketRepository basketRepository, IMapper mapper, IBasketProductRepository basketProductRepository)
+        public BasketController(IBasketRepository basketRepository,
+            IMapper mapper,
+            IBasketProductRepository basketProductRepository)
         {
             _basketRepository = basketRepository;
             _mapper = mapper;
             _basketProductRepository = basketProductRepository;
+
         }
 
         /// <summary>
-        /// get basketRepository using id
+        /// get basket using id
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
@@ -61,7 +62,7 @@ namespace ShoppingCard.Api.Controllers
 
         // todo: logic is going to be changed after adding cache and user
         /// <summary>
-        /// create basketRepository using BasketRequest
+        /// create basket using BasketRequest
         /// </summary>
         /// <param name="basketRequest"></param>
         /// <returns></returns>
@@ -77,7 +78,7 @@ namespace ShoppingCard.Api.Controllers
 
 
         /// <summary>
-        /// delete basketRepository using id
+        /// delete basket using id
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
@@ -99,30 +100,11 @@ namespace ShoppingCard.Api.Controllers
 
 
         /// <summary>
-        /// getting products of a basketRepository
+        /// get a basketProduct using id
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
-        [HttpGet("{id:guid}/products")]
-        [ProducesResponseType(StatusCodes.Status200OK)]
-        [ProducesResponseType(StatusCodes.Status404NotFound)]
-        public async Task<ActionResult<List<BasketProduct>>> GetBasketProducts(Guid id)
-        {
-            var basket = await _basketRepository.GetAsync(id, HttpContext.RequestAborted);
-
-            if (basket == null)
-                return NotFound();
-
-            return Ok(basket);
-        }
-
-
-        /// <summary>
-        /// get a basketProductRepository using id
-        /// </summary>
-        /// <param name="id"></param>
-        /// <returns></returns>
-        [HttpGet("{id:guid}/products/{productId:guid}")]
+        [HttpGet("{id:guid}/products/{basketProductId:guid}")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         public async Task<ActionResult<BasketProduct>> GetBasketProductInfo(Guid id, Guid productId)
@@ -138,25 +120,32 @@ namespace ShoppingCard.Api.Controllers
 
 
         /// <summary>
-        /// create basketProductRepository
+        /// create basketProduct
         /// </summary>
         /// <param name="id"></param>
         /// <param name="basketProductRequest"></param>
         /// <returns></returns>
         [HttpPost("{id:guid}/products")]
         [ProducesResponseType(StatusCodes.Status200OK)]
-        public async Task<IActionResult> Create(Guid id, [FromBody] BasketProductRequest basketProductRequest)
+        public async Task<IActionResult> AddBasketProduct(Guid id, [FromBody] BasketProductRequest basketProductRequest)
         {
+            var oldBasketProduct = await _basketProductRepository
+                .GetProductByBasketIdAsync(id, basketProductRequest.ProductId, HttpContext.RequestAborted);
+            if (oldBasketProduct != null)
+            {
+                oldBasketProduct.CountOfProduct += 1;
+                await _basketProductRepository.UpdateAsync(oldBasketProduct, HttpContext.RequestAborted);
+                return Ok();
+            }
             var basketProduct = _mapper.Map<BasketProduct>(basketProductRequest);
             basketProduct.BasketId = id;
-            basketProduct.Id = Guid.NewGuid();
             await _basketProductRepository.CreateAsync(basketProduct, HttpContext.RequestAborted);
             return Ok($"basketProductRepository created with id: {basketProduct.Id} and seqId: {basketProduct.SeqId}");
         }
 
 
         /// <summary>
-        /// get products of a basketRepository
+        /// get products of a basket
         /// </summary>
         /// <param name="id"></param>
         /// <param name="basketProductId"></param>
@@ -174,7 +163,6 @@ namespace ShoppingCard.Api.Controllers
             await _basketProductRepository.DeleteAsync(basketProduct, HttpContext.RequestAborted);
             return Ok();
         }
-
 
     }
 }

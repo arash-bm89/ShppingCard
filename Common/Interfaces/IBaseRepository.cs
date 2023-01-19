@@ -4,7 +4,6 @@ using Common.Models;
 namespace Common.Interfaces
 {
     // todo: findout what in means in c#?
-    // todo: why tfilter is a struct?
 
     public interface IBaseRepository<TModelBase, in TFilter> 
         where TModelBase : ModelBase

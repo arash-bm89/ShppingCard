@@ -15,7 +15,7 @@ namespace ShoppingCard.Api.Controllers
     /// actions of products in the database
     /// </summary>
     [ApiController]
-    [Route("api/products")]
+    [Route("products")]
     public class ProductController: BaseController
     {
         private readonly IProductRepository _productRepository;

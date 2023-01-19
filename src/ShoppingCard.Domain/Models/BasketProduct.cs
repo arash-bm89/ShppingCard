@@ -11,7 +11,6 @@ namespace ShoppingCard.Domain.Models
 {
     public class BasketProduct: ModelBase
     {
-        // todo: search about how not to stay on loop in serialization
 
         public Guid BasketId { get; set; }
         public Basket Basket { get; set; }

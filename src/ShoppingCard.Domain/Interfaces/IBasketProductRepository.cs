@@ -11,6 +11,6 @@ namespace ShoppingCard.Domain.Interfaces
 {
     public interface IBasketProductRepository: IBaseRepository<BasketProduct, BasketProductFilter>
     {
-        Task<Product?> GetProductByBasketIdAsync(Guid basketId, Guid productId, CancellationToken cancellationToken);
+        Task<BasketProduct?> GetProductByBasketIdAsync(Guid basketId, Guid productId, CancellationToken cancellationToken);
     }
 }

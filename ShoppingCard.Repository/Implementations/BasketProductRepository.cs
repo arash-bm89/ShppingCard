@@ -33,11 +33,11 @@ namespace ShoppingCard.Repository.Implementations
             return query;
         }
 
-        public async Task<Domain.Models.Product?> GetProductByBasketIdAsync(Guid basketId, Guid productId, CancellationToken cancellationToken)
+        public async Task<Domain.Models.BasketProduct?> GetProductByBasketIdAsync(Guid basketId, Guid productId, CancellationToken cancellationToken)
         {
             return await _dbSet
                 .Where(x => x.ProductId == productId && x.BasketId == basketId)
-                .Select(x => x.Product).FirstOrDefaultAsync(cancellationToken);
+                .FirstOrDefaultAsync(cancellationToken);
         }
     }
 }

@@ -9,7 +9,7 @@ namespace ShoppingCard.Api.Controllers
     /// <summary>
     /// actions of basketProducts 
     /// </summary>
-    [Route("api/basketProducts")]
+    [Route("basketProducts")]
     public class BasketProductController: BaseController
     {
         private readonly IBasketProductRepository _basketProductRepository;

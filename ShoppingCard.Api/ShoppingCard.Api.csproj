@@ -4,6 +4,8 @@
     <TargetFramework>net6.0</TargetFramework>
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
+    <GenerateDocumentationFile>True</GenerateDocumentationFile>
+    <DocumentationFile>C:\Users\Arash\source\repos\ShppingCard\ShoppingCard.Api\basket.xml</DocumentationFile>
   </PropertyGroup>
 
   <ItemGroup>

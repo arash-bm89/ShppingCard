@@ -2,6 +2,7 @@
 using ShoppingCard.Domain.Interfaces;
 using ShoppingCard.Repository;
 using ShoppingCard.Repository.Implementations;
+using ShoppingCard.Service.IServices;
 
 namespace ShoppingCard.Api.ExtensionMethods
 {
@@ -20,6 +21,7 @@ namespace ShoppingCard.Api.ExtensionMethods
             services.AddScoped<IBasketRepository, BasketRepository>();
             services.AddScoped<IProductRepository, ProductRepository>();
             services.AddScoped<IBasketProductRepository, BasketProductRepository>();
+            services.AddScoped<ICachingService, CachingService>();
         }
 
     }

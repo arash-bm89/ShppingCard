@@ -28,5 +28,4 @@ namespace ShoppingCard.Domain.Models
         public DateTimeOffset DeliveryAt { get; set; }
     }
 
-    // todo: cachebasket, it will use for the finall basket on db
 }

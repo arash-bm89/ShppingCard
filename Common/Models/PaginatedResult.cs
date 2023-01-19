@@ -6,7 +6,6 @@ using System.Threading.Tasks;
 
 namespace Common.Models
 {
-    // todo: why in main source code they use ipaginatedResult and imodelBase
     public class PaginatedResult<TModelBase> 
     where TModelBase : ModelBase
     {
