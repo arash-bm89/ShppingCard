@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -26,7 +27,7 @@ namespace ShoppingCard.Domain.Models
         public decimal Price { get; set; }
 
         [MaxLength(300)]
-        public string Description { get; set; }
+        public string? Description { get; set; }
 
         /// <summary>
         /// number of available products
@@ -34,8 +35,12 @@ namespace ShoppingCard.Domain.Models
         [Required]
         public uint NumberOfAvailable { get; set; }
 
+        [NotMapped]
+        public bool IsAvailable => NumberOfAvailable != 0;
+
+
         [MaxLength(100)]
-        public string ImageUrl { get; set; }
+        public string? ImageUrl { get; set; }
 
         /// <summary>
         /// using for many to many relationship between basket and product

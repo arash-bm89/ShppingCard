@@ -20,18 +20,5 @@ namespace ShoppingCard.Api.Controllers
             _mapper = mapper;
         }
 
-
-        // todo: going to be commented after finalize
-        /// <summary>
-        /// Get all the baskets (for testing)
-        /// </summary>
-        /// <returns></returns>
-        [HttpGet]
-        public async Task<List<BasketProduct>?> GetAll()
-        {
-            return await _basketProductRepository.GetAllAsync(HttpContext.RequestAborted);
-        }
-
-
     }
 }

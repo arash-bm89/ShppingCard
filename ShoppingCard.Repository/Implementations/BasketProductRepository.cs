@@ -12,28 +12,28 @@ using ShoppingCard.Domain.Models;
 
 namespace ShoppingCard.Repository.Implementations
 {
-    public class BasketProductRepository: Repository<BasketProduct, BasketProductFilter>, IBasketProductRepository
+    public class BasketProductRepository: BaseRepository<Domain.Models.BasketProduct, BasketProductFilter>, IBasketProductRepository
     {
         public BasketProductRepository(ApplicationDbContext db) : base(db)
         {
         }
 
-        protected override IQueryable<BasketProduct> ConfigureInclude(IQueryable<BasketProduct> query)
+        protected override IQueryable<Domain.Models.BasketProduct> ConfigureInclude(IQueryable<Domain.Models.BasketProduct> query)
         {
             return query.Include(x => x.Product).Include(x => x.Product);
         }
 
-        protected override IQueryable<BasketProduct> ConfigureListInclude(IQueryable<BasketProduct> query)
+        protected override IQueryable<Domain.Models.BasketProduct> ConfigureListInclude(IQueryable<Domain.Models.BasketProduct> query)
         {
             return query;
         }
 
-        protected override IQueryable<BasketProduct> ApplyFilter(IQueryable<BasketProduct> query, BasketProductFilter filter)
+        protected override IQueryable<Domain.Models.BasketProduct> ApplyFilter(IQueryable<Domain.Models.BasketProduct> query, BasketProductFilter filter)
         {
             return query;
         }
 
-        public async Task<Product?> GetProductByBasketIdAsync(Guid basketId, Guid productId, CancellationToken cancellationToken)
+        public async Task<Domain.Models.Product?> GetProductByBasketIdAsync(Guid basketId, Guid productId, CancellationToken cancellationToken)
         {
             return await _dbSet
                 .Where(x => x.ProductId == productId && x.BasketId == basketId)

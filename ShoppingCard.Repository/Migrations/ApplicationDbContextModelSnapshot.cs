@@ -60,7 +60,7 @@ namespace ShoppingCard.Repository.Migrations
                     b.HasIndex("SeqId")
                         .IsUnique();
 
-                    b.ToTable("Baskets");
+                    b.ToTable("Baskets", (string)null);
                 });
 
             modelBuilder.Entity("ShoppingCard.Domain.Models.BasketProduct", b =>
@@ -114,7 +114,7 @@ namespace ShoppingCard.Repository.Migrations
                     b.HasIndex("SeqId")
                         .IsUnique();
 
-                    b.ToTable("BasketProducts");
+                    b.ToTable("BasketProducts", (string)null);
                 });
 
             modelBuilder.Entity("ShoppingCard.Domain.Models.Payment", b =>
@@ -169,7 +169,7 @@ namespace ShoppingCard.Repository.Migrations
                     b.HasIndex("SeqId")
                         .IsUnique();
 
-                    b.ToTable("Payments");
+                    b.ToTable("Payments", (string)null);
                 });
 
             modelBuilder.Entity("ShoppingCard.Domain.Models.Product", b =>
@@ -186,12 +186,10 @@ namespace ShoppingCard.Repository.Migrations
                         .HasColumnType("timestamp with time zone");
 
                     b.Property<string>("Description")
-                        .IsRequired()
                         .HasMaxLength(300)
                         .HasColumnType("character varying(300)");
 
                     b.Property<string>("ImageUrl")
-                        .IsRequired()
                         .HasMaxLength(100)
                         .HasColumnType("character varying(100)");
 
@@ -231,7 +229,7 @@ namespace ShoppingCard.Repository.Migrations
                     b.HasIndex("SeqId")
                         .IsUnique();
 
-                    b.ToTable("Products");
+                    b.ToTable("Products", (string)null);
                 });
 
             modelBuilder.Entity("ShoppingCard.Domain.Models.BasketProduct", b =>

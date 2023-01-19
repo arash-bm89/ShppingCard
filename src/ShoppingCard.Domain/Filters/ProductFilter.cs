@@ -19,7 +19,8 @@ namespace ShoppingCard.Domain.Filters
         [DefaultValue(10)]
         public int Count { get; set; }
 
-        [DefaultValue("")]
-        public string Name { get; set; }
+        public string? Name { get; set; }
+
+        public bool? IsAvailable { get; set; }
     }
 }

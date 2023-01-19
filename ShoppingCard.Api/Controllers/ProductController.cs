@@ -8,6 +8,9 @@ using ShoppingCard.Domain.Models;
 
 namespace ShoppingCard.Api.Controllers
 {
+    // todo: implementing update endpoint
+    // CHECKED
+
     /// <summary>
     /// actions of products in the database
     /// </summary>
@@ -25,20 +28,8 @@ namespace ShoppingCard.Api.Controllers
         }
 
 
-        // todo: going to be commented after finalize
         /// <summary>
-        /// Get all the products (for testing)
-        /// </summary>
-        /// <returns></returns>
-        [HttpGet]
-        public async Task<List<Product>?> GetAll()
-        {
-            return await _productRepository.GetAllAsync(HttpContext.RequestAborted);
-        }
-
-
-        /// <summary>
-        /// get product using id
+        /// get productRepository using id
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
@@ -47,7 +38,7 @@ namespace ShoppingCard.Api.Controllers
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         public async Task<ActionResult<Product>> Get(Guid id)
         {
-            var product = await _productRepository.GetByIdAsync(id, HttpContext.RequestAborted);
+            var product = await _productRepository.GetAsync(id, HttpContext.RequestAborted);
 
             if (product == null)
             {
@@ -59,7 +50,7 @@ namespace ShoppingCard.Api.Controllers
 
 
         /// <summary>
-        /// create product using ProductRequest
+        /// create productRepository using ProductRequest
         /// </summary>
         /// <param name="productRequest"></param>
         /// <returns></returns>
@@ -85,15 +76,34 @@ namespace ShoppingCard.Api.Controllers
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         public async Task<IActionResult> Delete(Guid id)
         {
-
-            await _productRepository.DeleteByIdAsync(id, HttpContext.RequestAborted);
+            await _productRepository.DeleteAsync(id, HttpContext.RequestAborted);
             return Ok();
         }
 
-        [HttpGet("TEst")]
-        public async Task<ActionResult<PaginatedResult<Product>>> testListQuery([FromQuery] ProductFilter filter)
+        [HttpGet("available")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        public async Task<ActionResult<PaginatedResult<Product>>> GetProducts(
+            int offset = 0,
+            int count = 10,
+            string? name = null,
+            bool? isAvailable = null
+            )
         {
-            return await _productRepository.GetListAsync(filter, HttpContext.RequestAborted);
+            var paginatedProducts = await _productRepository
+                .GetListAsync(new ProductFilter()
+                {
+                    Offset = offset,
+                    Count = count,
+                    Name = name,
+                    IsAvailable = isAvailable
+
+                }, HttpContext.RequestAborted);
+
+            if (!paginatedProducts.HasAnyItems())
+                return NotFound();
+
+            return Ok(paginatedProducts);
         }
     }
 }

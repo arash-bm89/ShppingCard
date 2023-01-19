@@ -12,6 +12,9 @@ namespace Common.Models
     {
         public List<TModelBase>? Items { get; set; }
         public int TotalCount { get; set; }
-        public bool HasAnyItems() => this.Items != null && this.Items.Count != 0;
+        public bool HasAnyItems() => Items != null && Items.Count != 0;
+
     }
+
+    
 }

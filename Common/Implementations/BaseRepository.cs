@@ -8,22 +8,18 @@ using Common.ExtensionMethods;
 using Common.Interfaces;
 using Common.Models;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.ChangeTracking;
 
 namespace Common.Implementations
 {
-    public abstract class Repository<TModelBase, TFilter>: IRepository<TModelBase, TFilter> 
+    public abstract class BaseRepository<TModelBase, TFilter>: IBaseRepository<TModelBase, TFilter> 
         where TModelBase : ModelBase
         where TFilter : struct, IListFilter
     {
-        // for now repository implemented using eager loading
 
-        // todo: ask about eager one and implement the class using this pattern
-        // todo: ask about filter & pagination
-        // todo: see the pagination section of the course
+        // todo: implement setupPaging
 
         // todo: is it better to handle notfound element in db inside the application or inside the stack?
-
-        // todo: differences of configureInclude and ConfigureListInclude
 
 
         #region Properties
@@ -35,7 +31,7 @@ namespace Common.Implementations
 
         #region Ctor
 
-        public Repository(DbContext db)
+        public BaseRepository(DbContext db)
         {
             _db = db;
             _dbSet = db.Set<TModelBase>();
@@ -53,47 +49,60 @@ namespace Common.Implementations
 
         #region InterfaceImplementations
 
-        public virtual async Task<TModelBase?> GetByIdAsync(Guid id, CancellationToken cancellationToken)
+        public virtual async Task<TModelBase?> GetAsync(Guid id, CancellationToken cancellationToken)
         {
             // todo: ask what the hell is this?!
-            return await _dbSet.Apply<TModelBase, TModelBase>(new Func<IQueryable<TModelBase>, IQueryable<TModelBase>>(this.ConfigureInclude))
-                .AsNoTracking().FirstOrDefaultAsync(x => x.Id == id, cancellationToken);
+            return await _dbSet
+                .Apply(ConfigureInclude)
+                .AsNoTracking()
+                .FirstOrDefaultAsync(x => x.Id == id, cancellationToken);
         }
 
-        public virtual async Task<TModelBase?> GetBySeqIdAsync(uint seqId, CancellationToken cancellationToken)
+        public virtual async Task<TModelBase?> GetAsync(uint seqId, CancellationToken cancellationToken)
         {
-            return await _dbSet.Apply<TModelBase, TModelBase>(new Func<IQueryable<TModelBase>, IQueryable<TModelBase>>(this.ConfigureInclude))
-                .AsNoTracking().FirstOrDefaultAsync(x => x.SeqId == seqId, cancellationToken);
+            return await _dbSet
+                .Apply(ConfigureInclude)
+                .AsNoTracking()
+                .FirstOrDefaultAsync(x => x.SeqId == seqId, cancellationToken);
         }
 
-        public virtual async Task<TModelBase?> GetByIdWithoutIncludeAsync(Guid id, CancellationToken cancellationToken)
+        public virtual async Task<TModelBase?> GetWithoutIncludeAsync(Guid id, CancellationToken cancellationToken)
         {
-            // todo: ask what the hell is this?!
-            return await _dbSet.AsNoTracking().FirstOrDefaultAsync(x => x.Id == id, cancellationToken);
+            return await _dbSet
+                .AsNoTracking()
+                .FirstOrDefaultAsync(x => x.Id == id, cancellationToken);
         }
 
-        public virtual async Task<TModelBase?> GetBySeqIdWithoutIncludeAsync(uint seqId, CancellationToken cancellationToken)
+        public virtual async Task<TModelBase?> GetWithoutIncludeAsync(uint seqId, CancellationToken cancellationToken)
         {
-            return await _dbSet.AsNoTracking().FirstOrDefaultAsync(x => x.SeqId == seqId, cancellationToken);
+            return await _dbSet
+                .AsNoTracking()
+                .FirstOrDefaultAsync(x => x.SeqId == seqId, cancellationToken);
         }
 
         public async Task<PaginatedResult<TModelBase>> GetListAsync(TFilter filter, CancellationToken cancellationToken)
         {
+            // todo: debug using console tab that how isAvailable will querying to the database
             var query = _dbSet.AsQueryable();
-            query = this.ApplyFilter(query, filter);
 
-            PaginatedResult<TModelBase> paginatedResult = new PaginatedResult<TModelBase>();
-            paginatedResult.Items = await _dbSet
-                .AsNoTracking()
-                .Apply(this.ConfigureListInclude)
-                .Skip(filter.Offset)
-                .Take(filter.Count)
-                .ToListAsync(cancellationToken);
-            paginatedResult.TotalCount = await _dbSet.CountAsync(cancellationToken);
-            
+            query = ApplyFilter(query, filter);
+
+            PaginatedResult<TModelBase> paginatedResult = new PaginatedResult<TModelBase>()
+            {
+                Items = await query
+                    .AsNoTracking()
+                    .Apply(ConfigureListInclude)
+                    .Apply(DefaultSortFunc)
+                    .Skip(filter.Offset)
+                    .Take(filter.Count)
+                    .ToListAsync(cancellationToken),
+
+                TotalCount = await _dbSet
+                    .CountAsync(cancellationToken),
+            };
+
             return paginatedResult;
         }
-
 
         public virtual async Task<List<TModelBase>?> GetAllAsync(CancellationToken cancellationToken)
         {
@@ -110,30 +119,49 @@ namespace Common.Implementations
 
         public virtual async Task CreateAsync(TModelBase model, CancellationToken cancellationToken)
         {
+            if (model.Id == default)
+            {
+                model.Id = Guid.NewGuid();
+            }
+
             await _dbSet.AddAsync(model, cancellationToken);
+
             await SaveChangesAsync(cancellationToken);
         }
 
         public virtual async Task CreateRangeAsync(List<TModelBase> models, CancellationToken cancellationToken)
         {
+            if (!models.Any())
+                throw new InvalidOperationException("no objects to add range.");
+
+            foreach (TModelBase modelBase in models)
+            {
+                if (modelBase.Id == default)
+                {
+                    modelBase.Id = Guid.NewGuid();
+                }
+            }
+
             await _dbSet.AddRangeAsync(models, cancellationToken);
             await SaveChangesAsync(cancellationToken);
         }
 
         public virtual async Task UpdateAsync(TModelBase model, CancellationToken cancellationToken)
         {
-            model.ModifiedAt = DateTimeOffset.Now;
-            _dbSet.Update(model);
+            PerformUpdateWithoutSaving(model);
             await SaveChangesAsync(cancellationToken);
         }
 
         public virtual async Task UpdateRangeAsync(List<TModelBase> models, CancellationToken cancellationToken)
         {
+            if (!models.Any())
+                throw new InvalidOperationException("no objects to add range.");
+
             foreach (TModelBase modelBase in models)
             {
-                modelBase.ModifiedAt = DateTimeOffset.Now;
+                PerformUpdateWithoutSaving(modelBase);
             }
-            _dbSet.UpdateRange(models);
+
             await SaveChangesAsync(cancellationToken);
         }
 
@@ -143,15 +171,24 @@ namespace Common.Implementations
             await SaveChangesAsync(cancellationToken);
         }
 
-        public virtual async Task DeleteByIdAsync(Guid id, CancellationToken cancellationToken)
+        public virtual async Task DeleteAsync(Guid id, CancellationToken cancellationToken)
         {
-            var model = await GetByIdAsync(id, cancellationToken);
+            // todo: implementing exceptionMiddleware
+            var model = await GetAsync(id, cancellationToken);
+
+            if (model == null)
+                throw new Exception($"Entity not found for delete. entity: {typeof(TModelBase)} by id: {id}");
+
             await DeleteAsync(model, cancellationToken);
         }
 
-        public virtual async Task DeleteBySeqIdAsync(uint seqId, CancellationToken cancellationToken)
+        public virtual async Task DeleteAsync(uint seqId, CancellationToken cancellationToken)
         {
-            var model = await GetBySeqIdAsync(seqId, cancellationToken);
+            var model = await GetAsync(seqId, cancellationToken);
+
+            if (model == null)
+                throw new Exception($"Entity not found for delete. entity: {typeof(TModelBase)} by seqId: {seqId}");
+
             await DeleteAsync(model, cancellationToken);
         }
 
@@ -184,9 +221,32 @@ namespace Common.Implementations
             efEntry.Property(x => x.DeletedAt).IsModified = true;
         }
 
+        protected virtual void PerformUpdateWithoutSaving(TModelBase modelBase)
+        {
+            modelBase.ModifiedAt = DateTimeOffset.UtcNow;
+            EntityEntry<TModelBase> efEntry = _dbSet.Entry(modelBase);
+
+            if (efEntry.State == EntityState.Detached)
+            {
+                _db.Attach(modelBase);
+            }
+
+            efEntry.Property(x => x.SeqId).IsModified = false;
+            efEntry.Property(x => x.CreatedAt).IsModified = false;
+
+            _dbSet.Update(modelBase);
+
+        }
+
         protected virtual async Task SaveChangesAsync(CancellationToken cancellationToken)
         {
             await _db.SaveChangesAsync(cancellationToken);
+        }
+
+        protected virtual IQueryable<TModelBase> DefaultSortFunc(IQueryable<TModelBase> query)
+        {
+            query = query.OrderByDescending(x => x.SeqId);
+            return query;
         }
 
         #endregion

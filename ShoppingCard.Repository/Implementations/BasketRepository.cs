@@ -11,23 +11,23 @@ using ShoppingCard.Domain.Models;
 
 namespace ShoppingCard.Repository.Implementations
 {
-    public class BasketRepository: Repository<Basket, BasketFilter>, IBasketRepository
+    public class BasketRepository: BaseRepository<Domain.Models.Basket, BasketFilter>, IBasketRepository
     {
         public BasketRepository(ApplicationDbContext db) : base(db)
         {
         }
 
-        protected override IQueryable<Basket> ConfigureInclude(IQueryable<Basket> query)
+        protected override IQueryable<Domain.Models.Basket> ConfigureInclude(IQueryable<Domain.Models.Basket> query)
         {
             return query.Include(x => x.BasketProducts).ThenInclude(x => x.Product);
         }
 
-        protected override IQueryable<Basket> ConfigureListInclude(IQueryable<Basket> query)
+        protected override IQueryable<Domain.Models.Basket> ConfigureListInclude(IQueryable<Domain.Models.Basket> query)
         {
             return query;
         }
 
-        protected override IQueryable<Basket> ApplyFilter(IQueryable<Basket> query, BasketFilter filter)
+        protected override IQueryable<Domain.Models.Basket> ApplyFilter(IQueryable<Domain.Models.Basket> query, BasketFilter filter)
         {
             return query;
         }

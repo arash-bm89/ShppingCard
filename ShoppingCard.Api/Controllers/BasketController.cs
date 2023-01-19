@@ -10,6 +10,8 @@ using ShoppingCard.Api.Models;
 using ShoppingCard.Domain.Interfaces;
 using ShoppingCard.Domain.Models;
 using ShoppingCard.Repository.Implementations;
+using Basket = ShoppingCard.Domain.Models.Basket;
+using BasketProduct = ShoppingCard.Domain.Models.BasketProduct;
 
 namespace ShoppingCard.Api.Controllers
 {
@@ -19,7 +21,7 @@ namespace ShoppingCard.Api.Controllers
     // so how requestAborted is going to work for each one right?
 
     /// <summary>
-    /// using for actions of final basket
+    /// using for actions of final basketRepository
     /// </summary>
     [ApiController]
     [Route("api/baskets")]
@@ -36,22 +38,8 @@ namespace ShoppingCard.Api.Controllers
             _basketProductRepository = basketProductRepository;
         }
 
-
-        // todo: going to be commented after finalize
         /// <summary>
-        /// Get all the baskets (for testing)
-        /// </summary>
-        /// <returns></returns>
-        [HttpGet("get-all")]
-        [ProducesResponseType(StatusCodes.Status200OK)]
-        public async Task<List<Basket>?> GetAll()
-        {
-            return await _basketRepository.GetAllAsync(HttpContext.RequestAborted);
-        }
-
-
-        /// <summary>
-        /// get basket using id
+        /// get basketRepository using id
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
@@ -60,7 +48,7 @@ namespace ShoppingCard.Api.Controllers
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         public async Task<ActionResult<Basket>> Get(Guid id)
         {
-            var basket = await _basketRepository.GetByIdAsync(id, HttpContext.RequestAborted);
+            var basket = await _basketRepository.GetAsync(id, HttpContext.RequestAborted);
 
             if (basket == null)
             {
@@ -73,7 +61,7 @@ namespace ShoppingCard.Api.Controllers
 
         // todo: logic is going to be changed after adding cache and user
         /// <summary>
-        /// create basket using BasketRequest
+        /// create basketRepository using BasketRequest
         /// </summary>
         /// <param name="basketRequest"></param>
         /// <returns></returns>
@@ -84,12 +72,12 @@ namespace ShoppingCard.Api.Controllers
             var basket = _mapper.Map<Basket>(basketRequest);
             basket.Id = Guid.NewGuid();
             await _basketRepository.CreateAsync(basket, HttpContext.RequestAborted);
-            return Ok($"basket created with id: {basket.Id} and seqId: {basket.SeqId}");
+            return Ok($"basketRepository created with id: {basket.Id} and seqId: {basket.SeqId}");
         }
 
 
         /// <summary>
-        /// delete basket using id
+        /// delete basketRepository using id
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
@@ -98,7 +86,7 @@ namespace ShoppingCard.Api.Controllers
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         public async Task<IActionResult> DeleteBasket(Guid id)
         {
-            var basket = await _basketRepository.GetByIdAsync(id, HttpContext.RequestAborted);
+            var basket = await _basketRepository.GetAsync(id, HttpContext.RequestAborted);
             
             if (basket == null)
             {
@@ -111,16 +99,16 @@ namespace ShoppingCard.Api.Controllers
 
 
         /// <summary>
-        /// getting products of a basket
+        /// getting products of a basketRepository
         /// </summary>
-        /// <param name="basketId"></param>
+        /// <param name="id"></param>
         /// <returns></returns>
-        [HttpGet("{basketId:guid}/products")]
+        [HttpGet("{id:guid}/products")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
-        public async Task<ActionResult<List<BasketProduct>>> GetBasketProducts(Guid basketId)
+        public async Task<ActionResult<List<BasketProduct>>> GetBasketProducts(Guid id)
         {
-            var basket = await _basketRepository.GetByIdAsync(basketId, HttpContext.RequestAborted);
+            var basket = await _basketRepository.GetAsync(id, HttpContext.RequestAborted);
 
             if (basket == null)
                 return NotFound();
@@ -130,17 +118,17 @@ namespace ShoppingCard.Api.Controllers
 
 
         /// <summary>
-        /// get a basketProduct using id
+        /// get a basketProductRepository using id
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
-        [HttpGet("{basketId:guid}/products/{productId:guid}")]
+        [HttpGet("{id:guid}/products/{productId:guid}")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
-        public async Task<ActionResult<BasketProduct>> GetBasketProductInfo(Guid basketId, Guid productId)
+        public async Task<ActionResult<BasketProduct>> GetBasketProductInfo(Guid id, Guid productId)
         {
             var basketProduct = await _basketProductRepository
-                .GetProductByBasketIdAsync(basketId, productId, HttpContext.RequestAborted);
+                .GetProductByBasketIdAsync(id, productId, HttpContext.RequestAborted);
 
             if (basketProduct == null)
                 return NotFound();
@@ -150,8 +138,9 @@ namespace ShoppingCard.Api.Controllers
 
 
         /// <summary>
-        /// create basketProduct
+        /// create basketProductRepository
         /// </summary>
+        /// <param name="id"></param>
         /// <param name="basketProductRequest"></param>
         /// <returns></returns>
         [HttpPost("{id:guid}/products")]
@@ -162,20 +151,22 @@ namespace ShoppingCard.Api.Controllers
             basketProduct.BasketId = id;
             basketProduct.Id = Guid.NewGuid();
             await _basketProductRepository.CreateAsync(basketProduct, HttpContext.RequestAborted);
-            return Ok($"basketProduct created with id: {basketProduct.Id} and seqId: {basketProduct.SeqId}");
+            return Ok($"basketProductRepository created with id: {basketProduct.Id} and seqId: {basketProduct.SeqId}");
         }
 
+
         /// <summary>
-        /// get products of a basket
+        /// get products of a basketRepository
         /// </summary>
         /// <param name="id"></param>
+        /// <param name="basketProductId"></param>
         /// <returns></returns>
-        [HttpDelete("{basketId:guid}/products/{basketProductId}")]
+        [HttpDelete("{id:guid}/products/{basketProductId:guid}")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
-        public async Task<IActionResult> DeleteBasketProduct(Guid basktId, Guid basketProductId)
+        public async Task<IActionResult> DeleteBasketProduct(Guid id, Guid basketProductId)
         {
-            var basketProduct = await _basketProductRepository.GetByIdAsync(basketProductId, HttpContext.RequestAborted);
+            var basketProduct = await _basketProductRepository.GetAsync(basketProductId, HttpContext.RequestAborted);
 
             if (basketProduct == null)
                 return NotFound();
@@ -183,6 +174,7 @@ namespace ShoppingCard.Api.Controllers
             await _basketProductRepository.DeleteAsync(basketProduct, HttpContext.RequestAborted);
             return Ok();
         }
+
 
     }
 }

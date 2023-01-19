@@ -26,7 +26,7 @@ builder.Services.AddSwaggerGen();
 // Add DbContext to the application
 builder.Services.AddApplicationDbContext(builder.Configuration);
 
-// Add Repository services
+// Add BaseRepository services
 builder.Services.AddRepositories();
 
 // Add AutoMapper service

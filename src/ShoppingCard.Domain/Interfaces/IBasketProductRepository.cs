@@ -9,7 +9,7 @@ using ShoppingCard.Domain.Models;
 
 namespace ShoppingCard.Domain.Interfaces
 {
-    public interface IBasketProductRepository: IRepository<BasketProduct, BasketProductFilter>
+    public interface IBasketProductRepository: IBaseRepository<BasketProduct, BasketProductFilter>
     {
         Task<Product?> GetProductByBasketIdAsync(Guid basketId, Guid productId, CancellationToken cancellationToken);
     }
