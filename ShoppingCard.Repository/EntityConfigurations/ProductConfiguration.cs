@@ -14,7 +14,7 @@ namespace ShoppingCard.Repository.EntityConfigurations
     {
         public override void DerivedConfigure(EntityTypeBuilder<Product> builder)
         {
-            builder.HasIndex(x => x.Name).HasFilter("IsDeleted = false").IsUnique();
+            builder.HasIndex(x => x.Name).IsUnique();
         }
     }
 }

@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using Common.ExtensionMethods;
 using Common.Models;
 using Microsoft.AspNetCore.Mvc;
 using ShoppingCard.Api.Models;
@@ -8,7 +9,6 @@ using ShoppingCard.Domain.Models;
 
 namespace ShoppingCard.Api.Controllers
 {
-    // todo: implementing update endpoint
     // CHECKED
 
     /// <summary>
@@ -56,12 +56,43 @@ namespace ShoppingCard.Api.Controllers
         /// <returns></returns>
         [HttpPost]
         [ProducesResponseType(StatusCodes.Status200OK)]
-        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
         public async Task<IActionResult> Create(ProductRequest productRequest)
         {
+            bool isAny = await _productRepository
+                .HasAnyAsync(x => x.Name == productRequest.Name, HttpContext.RequestAborted);
+
+            if (isAny)
+            {
+                return BadRequest("Product with this name is already available");
+            }
+            
             var product = _mapper.Map<Product>(productRequest);
-            product.Id = Guid.NewGuid();
             await _productRepository.CreateAsync(product, HttpContext.RequestAborted);
+            return Ok();
+        }
+
+
+        [HttpPut("{id:guid}")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        public async Task<IActionResult> Update(Guid id, ProductRequest productRequest)
+        {
+            var product = await _productRepository.GetAsync(id, HttpContext.RequestAborted);
+
+            if (product == null)
+            {
+                return NotFound($"product with id: {id} not found");
+            }
+
+            if ((productRequest.Name != product.Name) &&
+                await _productRepository.HasAnyAsync(x => x.Name == productRequest.Name, HttpContext.RequestAborted))
+            {
+                return BadRequest("Product with this name is already available");
+            }
+
+            var updatedProduct = _mapper.Map<Product>(productRequest);
+            product.SetBaseModelPropsToRequest(updatedProduct);
+            await _productRepository.UpdateAsync(updatedProduct, HttpContext.RequestAborted);
             return Ok();
         }
 

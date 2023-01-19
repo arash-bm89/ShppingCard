@@ -42,6 +42,7 @@ namespace Common.Interfaces
         /// <returns></returns>
         Task DeleteRangeAsync(List<TModelBase> models, CancellationToken cancellationToken);
         
+        Task<bool> HasAnyAsync(Expression<Func<TModelBase, bool>> predicate, CancellationToken cancellationToken);
 
         #endregion
 

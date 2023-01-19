@@ -201,6 +201,11 @@ namespace Common.Implementations
             await SaveChangesAsync(cancellationToken);
         }
 
+        public async Task<bool> HasAnyAsync(Expression<Func<TModelBase, bool>> predicate, CancellationToken cancellationToken)
+        {
+            return await _dbSet.AsNoTracking().AnyAsync(predicate, cancellationToken);
+        }
+
         #endregion
 
         #region Protecteds
@@ -231,10 +236,10 @@ namespace Common.Implementations
                 _db.Attach(modelBase);
             }
 
+            _dbSet.Update(modelBase);
+
             efEntry.Property(x => x.SeqId).IsModified = false;
             efEntry.Property(x => x.CreatedAt).IsModified = false;
-
-            _dbSet.Update(modelBase);
 
         }
 
