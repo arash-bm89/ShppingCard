@@ -33,10 +33,10 @@ namespace ShoppingCard.Domain.Models
         /// number of available products
         /// </summary>
         [Required]
-        public uint NumberOfAvailable { get; set; }
+        public uint Stock { get; set; }
 
         [NotMapped]
-        public bool IsAvailable => NumberOfAvailable != 0;
+        public bool IsAvailable => Stock != 0;
 
 
         [MaxLength(100)]

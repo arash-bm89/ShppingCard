@@ -38,8 +38,8 @@ namespace ShoppingCard.Repository.Implementations
             if (filter.IsAvailable != null)
             {
                 query = filter.IsAvailable == true 
-                    ? query.Where(x => x.NumberOfAvailable != 0)
-                    : query.Where(x => x.NumberOfAvailable == 0);
+                    ? query.Where(x => x.Stock != 0)
+                    : query.Where(x => x.Stock == 0);
             }
 
             query.Apply(OrderByIsAvailable);

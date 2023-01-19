@@ -29,54 +29,70 @@ namespace ShoppingCard.Api.Controllers
 
 
         /// <summary>
-        /// get productRepository using id
+        /// get product using id
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
         [HttpGet("{id:guid}")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
-        public async Task<ActionResult<Product>> Get(Guid id)
+        public async Task<ActionResult<ProductResponse>> Get(Guid id)
         {
             var product = await _productRepository.GetAsync(id, HttpContext.RequestAborted);
 
             if (product == null)
             {
-                return NotFound();
+                return NotFound($"product with id: {id} not found");
             }
 
-            return Ok(product);
+            return Ok(_mapper.Map<ProductResponse>(product));
         }
 
 
         /// <summary>
-        /// create productRepository using ProductRequest
+        /// create product
         /// </summary>
         /// <param name="productRequest"></param>
         /// <returns></returns>
         [HttpPost]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        public async Task<IActionResult> Create(ProductRequest productRequest)
+        public async Task<ActionResult<ProductResponse>> Create(ProductRequest productRequest)
         {
+            if (productRequest.Price == 0 || productRequest.Stock == 0)
+            {
+                return BadRequest("Price or stock can not be 0.");
+            }
+
             bool isAny = await _productRepository
                 .HasAnyAsync(x => x.Name == productRequest.Name, HttpContext.RequestAborted);
 
             if (isAny)
             {
-                return BadRequest("Product with this name is already available");
+                return BadRequest($"Product with the name: {productRequest.Name} has been used.");
             }
             
             var product = _mapper.Map<Product>(productRequest);
             await _productRepository.CreateAsync(product, HttpContext.RequestAborted);
-            return Ok();
+            
+            return Ok(_mapper.Map<ProductResponse>(product));
         }
 
 
+        /// <summary>
+        /// update a product
+        /// </summary>
+        /// <param name="id"></param>
+        /// <param name="productRequest"></param>
+        /// <returns></returns>
         [HttpPut("{id:guid}")]
         [ProducesResponseType(StatusCodes.Status200OK)]
-        public async Task<IActionResult> Update(Guid id, ProductRequest productRequest)
+        public async Task<ActionResult<ProductResponse>> Update(Guid id, ProductRequest productRequest)
         {
+            if (productRequest.Price == 0 || productRequest.Stock == 0)
+            {
+                return BadRequest("Price or stock can not be 0.");
+            }
             var product = await _productRepository.GetAsync(id, HttpContext.RequestAborted);
 
             if (product == null)
@@ -87,7 +103,7 @@ namespace ShoppingCard.Api.Controllers
             if ((productRequest.Name != product.Name) &&
                 await _productRepository.HasAnyAsync(x => x.Name == productRequest.Name, HttpContext.RequestAborted))
             {
-                return BadRequest("Product with this name is already available");
+                return BadRequest($"Product with the name: {productRequest.Name} is already available");
             }
 
             var updatedProduct = _mapper.Map<Product>(productRequest);
@@ -98,7 +114,7 @@ namespace ShoppingCard.Api.Controllers
 
 
         /// <summary>
-        /// delete by id
+        /// delete product by id
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
@@ -111,7 +127,17 @@ namespace ShoppingCard.Api.Controllers
             return Ok();
         }
 
-        [HttpGet("available")]
+
+
+        /// <summary>
+        /// get products
+        /// </summary>
+        /// <param name="offset"></param>
+        /// <param name="count"></param>
+        /// <param name="name"></param>
+        /// <param name="isAvailable"></param>
+        /// <returns></returns>
+        [HttpGet("list")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         public async Task<ActionResult<PaginatedResult<Product>>> GetProducts(
@@ -133,7 +159,7 @@ namespace ShoppingCard.Api.Controllers
 
             if (!paginatedProducts.HasAnyItems())
                 return NotFound();
-
+            // todo: somehow return paginatedResult<productRequest>
             return Ok(paginatedProducts);
         }
     }

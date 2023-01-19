@@ -12,8 +12,8 @@ using ShoppingCard.Repository;
 namespace ShoppingCard.Repository.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20230116180727_make-database-from-the-scratch")]
-    partial class makedatabasefromthescratch
+    [Migration("20230119224411_ChangeNumberOfProductsColumnToStock")]
+    partial class ChangeNumberOfProductsColumnToStock
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -25,7 +25,7 @@ namespace ShoppingCard.Repository.Migrations
 
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
 
-            modelBuilder.Entity("ShoppingCard.Domain.Models.BasketRepository", b =>
+            modelBuilder.Entity("ShoppingCard.Domain.Models.Basket", b =>
                 {
                     b.Property<Guid>("Id")
                         .HasColumnType("uuid");
@@ -66,7 +66,7 @@ namespace ShoppingCard.Repository.Migrations
                     b.ToTable("Baskets");
                 });
 
-            modelBuilder.Entity("ShoppingCard.Domain.Models.BasketProductRepository", b =>
+            modelBuilder.Entity("ShoppingCard.Domain.Models.BasketProduct", b =>
                 {
                     b.Property<Guid>("Id")
                         .HasColumnType("uuid");
@@ -175,7 +175,7 @@ namespace ShoppingCard.Repository.Migrations
                     b.ToTable("Payments");
                 });
 
-            modelBuilder.Entity("ShoppingCard.Domain.Models.ProductRepository", b =>
+            modelBuilder.Entity("ShoppingCard.Domain.Models.Product", b =>
                 {
                     b.Property<Guid>("Id")
                         .HasColumnType("uuid");
@@ -189,12 +189,10 @@ namespace ShoppingCard.Repository.Migrations
                         .HasColumnType("timestamp with time zone");
 
                     b.Property<string>("Description")
-                        .IsRequired()
                         .HasMaxLength(300)
                         .HasColumnType("character varying(300)");
 
                     b.Property<string>("ImageUrl")
-                        .IsRequired()
                         .HasMaxLength(100)
                         .HasColumnType("character varying(100)");
 
@@ -211,9 +209,6 @@ namespace ShoppingCard.Repository.Migrations
                         .HasMaxLength(50)
                         .HasColumnType("character varying(50)");
 
-                    b.Property<long>("Stock")
-                        .HasColumnType("bigint");
-
                     b.Property<decimal>("Price")
                         .HasColumnType("numeric");
 
@@ -223,6 +218,9 @@ namespace ShoppingCard.Repository.Migrations
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<long>("SeqId"));
 
+                    b.Property<long>("Stock")
+                        .HasColumnType("bigint");
+
                     b.Property<uint>("Version")
                         .IsConcurrencyToken()
                         .ValueGeneratedOnAddOrUpdate()
@@ -231,50 +229,53 @@ namespace ShoppingCard.Repository.Migrations
 
                     b.HasKey("Id");
 
+                    b.HasIndex("Name")
+                        .IsUnique();
+
                     b.HasIndex("SeqId")
                         .IsUnique();
 
                     b.ToTable("Products");
                 });
 
-            modelBuilder.Entity("ShoppingCard.Domain.Models.BasketProductRepository", b =>
+            modelBuilder.Entity("ShoppingCard.Domain.Models.BasketProduct", b =>
                 {
-                    b.HasOne("ShoppingCard.Domain.Models.BasketRepository", "BasketRepository")
+                    b.HasOne("ShoppingCard.Domain.Models.Basket", "Basket")
                         .WithMany("BasketProducts")
                         .HasForeignKey("BasketId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
-                    b.HasOne("ShoppingCard.Domain.Models.ProductRepository", "ProductRepository")
+                    b.HasOne("ShoppingCard.Domain.Models.Product", "Product")
                         .WithMany("BasketProducts")
                         .HasForeignKey("ProductId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
-                    b.Navigation("BasketRepository");
+                    b.Navigation("Basket");
 
-                    b.Navigation("ProductRepository");
+                    b.Navigation("Product");
                 });
 
             modelBuilder.Entity("ShoppingCard.Domain.Models.Payment", b =>
                 {
-                    b.HasOne("ShoppingCard.Domain.Models.BasketRepository", "BasketRepository")
+                    b.HasOne("ShoppingCard.Domain.Models.Basket", "Basket")
                         .WithMany("Payments")
                         .HasForeignKey("BasketId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
-                    b.Navigation("BasketRepository");
+                    b.Navigation("Basket");
                 });
 
-            modelBuilder.Entity("ShoppingCard.Domain.Models.BasketRepository", b =>
+            modelBuilder.Entity("ShoppingCard.Domain.Models.Basket", b =>
                 {
                     b.Navigation("BasketProducts");
 
                     b.Navigation("Payments");
                 });
 
-            modelBuilder.Entity("ShoppingCard.Domain.Models.ProductRepository", b =>
+            modelBuilder.Entity("ShoppingCard.Domain.Models.Product", b =>
                 {
                     b.Navigation("BasketProducts");
                 });

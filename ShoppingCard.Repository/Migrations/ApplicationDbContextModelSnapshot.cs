@@ -27,9 +27,6 @@ namespace ShoppingCard.Repository.Migrations
                     b.Property<Guid>("Id")
                         .HasColumnType("uuid");
 
-                    b.Property<Guid?>("BasketCacheKey")
-                        .HasColumnType("uuid");
-
                     b.Property<DateTimeOffset>("CreatedAt")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("timestamp with time zone")
@@ -209,9 +206,6 @@ namespace ShoppingCard.Repository.Migrations
                         .HasMaxLength(50)
                         .HasColumnType("character varying(50)");
 
-                    b.Property<long>("NumberOfAvailable")
-                        .HasColumnType("bigint");
-
                     b.Property<decimal>("Price")
                         .HasColumnType("numeric");
 
@@ -220,6 +214,9 @@ namespace ShoppingCard.Repository.Migrations
                         .HasColumnType("bigint");
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<long>("SeqId"));
+
+                    b.Property<long>("Stock")
+                        .HasColumnType("bigint");
 
                     b.Property<uint>("Version")
                         .IsConcurrencyToken()
@@ -230,7 +227,8 @@ namespace ShoppingCard.Repository.Migrations
                     b.HasKey("Id");
 
                     b.HasIndex("Name")
-                        .IsUnique();
+                        .IsUnique()
+                        .HasFilter("\"IsDeleted\" = false");
 
                     b.HasIndex("SeqId")
                         .IsUnique();

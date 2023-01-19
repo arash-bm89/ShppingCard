@@ -12,7 +12,7 @@ namespace ShoppingCard.Api.Models
 
         public string Description { get; set; }
 
-        public uint NumberOfAvailable { get; set; }
+        public uint Stock { get; set; }
 
         public string ImageUrl { get; set; }
     }

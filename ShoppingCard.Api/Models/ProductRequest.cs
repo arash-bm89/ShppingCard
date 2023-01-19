@@ -13,11 +13,11 @@ namespace ShoppingCard.Api.Models
         public decimal Price { get; set; }
 
         [MaxLength(300)]
-        public string Description { get; set; }
+        public string? Description { get; set; }
 
         [Required]
-        public uint NumberOfAvailable { get; set; }
+        public uint Stock { get; set; }
 
-        public string ImageUrl { get; set; }
+        public string? ImageUrl { get; set; }
     }
 }

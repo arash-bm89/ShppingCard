@@ -94,7 +94,7 @@ namespace Common.Implementations
                     .Take(filter.Count)
                     .ToListAsync(cancellationToken),
 
-                TotalCount = await _dbSet
+                TotalCount = await query
                     .CountAsync(cancellationToken),
             };
 
@@ -107,12 +107,6 @@ namespace Common.Implementations
                 .AsNoTracking().ToListAsync(cancellationToken);
         }
 
-
-        [Obsolete]
-        public virtual async Task<List<TModelBase>?> GetByFilterAsync(Expression<Func<TModelBase, bool>> filter, CancellationToken cancellationToken)
-        {
-            return await _dbSet.AsNoTracking().Where(filter).ToListAsync(cancellationToken);
-        }
 
         public virtual async Task CreateAsync(TModelBase model, CancellationToken cancellationToken)
         {

@@ -126,9 +126,9 @@ namespace ShoppingCard.Api.Controllers
 
             var product = _cachingService.GetCachedProductByCachedBasket(cachedBasket, productId);
 
-            if (dbProduct.NumberOfAvailable < ((count ?? 1)))
+            if (dbProduct.Stock < ((count ?? 1)))
             {
-                return BadRequest($"Count Of Available Products In Database Is {dbProduct.NumberOfAvailable}, Less than {count ?? 1}");
+                return BadRequest($"Count Of Available Products In Database Is {dbProduct.Stock}, Less than {count ?? 1}");
             }
 
             // if cachedProduct was set already, just apply count in cachedProduct.

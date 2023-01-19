@@ -11,6 +11,7 @@ namespace ShoppingCard.Api.Configurations
         {
             CreateMap<Basket, BasketRequest>().ReverseMap();
             CreateMap<Product, ProductRequest>().ReverseMap();
+            CreateMap<Product, ProductResponse>().ReverseMap();
             CreateMap<BasketProduct, BasketProductRequest>().ReverseMap();
         }
     }
