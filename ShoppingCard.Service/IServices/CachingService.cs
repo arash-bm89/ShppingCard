@@ -33,6 +33,12 @@ namespace ShoppingCard.Service.IServices
             return basket.CachedProducts.FirstOrDefault(x => x.ProductId == productId);
         }
 
+        public List<CachedProduct>? GetAllCachedProducts(CachedBasket basket)
+        {
+            var cachedProducts = basket.CachedProducts.ToList();
+            return cachedProducts;
+        }
+
         public async Task StoreAsync(Guid id, CachedBasket basket)
         {
             var key = id.ToString();

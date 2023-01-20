@@ -25,11 +25,21 @@ namespace ShoppingCard.Repository.Implementations
 
         protected override IQueryable<Domain.Models.BasketProduct> ConfigureListInclude(IQueryable<Domain.Models.BasketProduct> query)
         {
-            return query;
+            return query.Include(x => x.Product);
         }
 
         protected override IQueryable<Domain.Models.BasketProduct> ApplyFilter(IQueryable<Domain.Models.BasketProduct> query, BasketProductFilter filter)
         {
+            if (filter.Ids != null && filter.Ids.Any())
+            {
+                query = query.Where(x => filter.Ids.Contains(x.Id));
+            }
+
+            if (filter.BasketId != null)
+            {
+                query = query.Where(x => x.BasketId == filter.BasketId);
+            }
+
             return query;
         }
 

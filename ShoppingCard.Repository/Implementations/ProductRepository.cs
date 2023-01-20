@@ -42,6 +42,11 @@ namespace ShoppingCard.Repository.Implementations
                     : query.Where(x => x.Stock == 0);
             }
 
+            if (filter.Ids != null && filter.Ids.Any())
+            {
+                query = query.Where(x => filter.Ids.Contains(x.Id));
+            }
+
             query.Apply(OrderByIsAvailable);
 
             return query;

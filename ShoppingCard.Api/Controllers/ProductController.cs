@@ -112,21 +112,30 @@ namespace ShoppingCard.Api.Controllers
             return Ok();
         }
 
-
         /// <summary>
-        /// delete product by id
+        /// making a  product by id
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
-        [HttpDelete("{id:guid}")]
+        [HttpPut("{id:guid}/make-unavailable")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
-        public async Task<IActionResult> Delete(Guid id)
+        public async Task<IActionResult> MakeAProductUnavailable(Guid id)
         {
-            await _productRepository.DeleteAsync(id, HttpContext.RequestAborted);
+            var product = await _productRepository.GetAsync(id, HttpContext.RequestAborted);
+
+            if (product == null)
+            {
+                return NotFound($"product with id: {id} not found.");
+            }
+
+            product.Stock = 0;
+            // better to become null
+            product.Price = 0;
+            await _productRepository.UpdateAsync(product, HttpContext.RequestAborted);
+
             return Ok();
         }
-
 
 
         /// <summary>
@@ -140,7 +149,7 @@ namespace ShoppingCard.Api.Controllers
         [HttpGet("list")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
-        public async Task<ActionResult<PaginatedResult<Product>>> GetProducts(
+        public async Task<ActionResult<PaginatedResponseResult<ProductResponse>>> GetProducts(
             int offset = 0,
             int count = 10,
             string? name = null,
@@ -158,9 +167,12 @@ namespace ShoppingCard.Api.Controllers
                 }, HttpContext.RequestAborted);
 
             if (!paginatedProducts.HasAnyItems())
-                return NotFound();
-            // todo: somehow return paginatedResult<productRequest>
-            return Ok(paginatedProducts);
+                return NotFound("No products found");
+
+
+            var paginatedProductsResponse = _mapper.Map<PaginatedResponseResult<ProductResponse>>(paginatedProducts);
+
+            return Ok(paginatedProductsResponse);
         }
     }
 }

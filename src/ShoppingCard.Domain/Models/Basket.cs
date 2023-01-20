@@ -33,7 +33,7 @@ namespace ShoppingCard.Domain.Models
         /// getting whole price after the task been calculated
         /// </summary>
         [NotMapped]
-        public decimal? FinalPrice => BasketProducts?.ToList().Sum(x => x.BasketProductPrice) * (decimal)1.09;
+        public decimal? FinalPrice => BasketProducts?.ToList().Sum(x => x.BasketProductPrice);
 
     }
 

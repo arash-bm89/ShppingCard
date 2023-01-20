@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
 using ShoppingCard.Domain.Models;
 using ShoppingCard.Repository.EntityConfigurations;
 
@@ -23,7 +24,7 @@ namespace ShoppingCard.Repository
         }
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
-            => optionsBuilder.LogTo(Console.WriteLine);
+            => optionsBuilder.LogTo(Console.WriteLine, LogLevel.Information);
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);

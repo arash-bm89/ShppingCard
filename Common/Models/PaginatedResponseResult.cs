@@ -3,18 +3,14 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using AutoMapper;
 
 namespace Common.Models
 {
-    public class PaginatedResult<TModelBase> 
-    where TModelBase : ModelBase
+    public class PaginatedResponseResult<TModel> 
+        where TModel : class
     {
-        public List<TModelBase>? Items { get; set; }
+        public List<TModel>? Items { get; set; }
         public int TotalCount { get; set; }
         public bool HasAnyItems() => Items != null && Items.Count != 0;
-
     }
-
-    
 }

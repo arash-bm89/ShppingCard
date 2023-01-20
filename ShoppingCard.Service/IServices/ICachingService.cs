@@ -11,6 +11,7 @@ namespace ShoppingCard.Service.IServices
     {
         Task<CachedBasket?> GetCachedBasketByIdAsync(Guid basketId);
         CachedProduct? GetCachedProductByCachedBasket(CachedBasket basket, Guid productId);
+        List<CachedProduct>? GetAllCachedProducts(CachedBasket basket);
         Task StoreAsync(Guid id, CachedBasket basket);
         void AddCachedProductToBasket(CachedBasket basket, CachedProduct product);
         void AddCachedProductToBasket(CachedBasket basket, Guid productId, uint count);

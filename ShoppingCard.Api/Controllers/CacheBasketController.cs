@@ -126,15 +126,15 @@ namespace ShoppingCard.Api.Controllers
 
             var product = _cachingService.GetCachedProductByCachedBasket(cachedBasket, productId);
 
-            if (dbProduct.Stock < ((count ?? 1)))
-            {
-                return BadRequest($"Count Of Available Products In Database Is {dbProduct.Stock}, Less than {count ?? 1}");
-            }
-
             // if cachedProduct was set already, just apply count in cachedProduct.
             // if count == null update
             if (product != null)
             {
+                if (dbProduct.Stock < ((count ?? product.Count + 1)))
+                {
+                    return BadRequest($"Count Of Available Products In Database Is {dbProduct.Stock}, Less than {count ?? product.Count + 1}");
+                }
+
                 if (count == null)
                 {
                     _cachingService.ApplyIncrementByOneToCachedProduct(product);
@@ -150,6 +150,10 @@ namespace ShoppingCard.Api.Controllers
             // and if count was null it will add with count of one
             else 
             {
+                if (dbProduct.Stock < ((count ?? 1)))
+                {
+                    return BadRequest($"Count Of Available Products In Database Is {dbProduct.Stock}, Less than {count ?? 1}");
+                }
                 if (count == null)
                 {
                     _cachingService.AddCachedProductToBasket(
@@ -164,7 +168,6 @@ namespace ShoppingCard.Api.Controllers
                         productId,
                         (uint)count);
                 }
-                
             }
 
             await _cachingService.StoreAsync(id, cachedBasket);
