@@ -19,6 +19,5 @@ public class OrderProductResponse
     /// <summary>
     ///     price of all products of this type in a basket
     /// </summary>
-    [NotMapped]
-    public decimal TotalPrice => Count * Product.Price;
+    public decimal TotalPrice { get; set; }
 }

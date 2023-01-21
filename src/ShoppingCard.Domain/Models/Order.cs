@@ -17,8 +17,7 @@ public class Order : ModelBase
     /// <summary>
     ///     getting whole price after the task been calculated
     /// </summary>
-    [NotMapped]
-    public decimal? FinalPrice => Products?.ToList().Sum(x => x.TotalPrice);
+    public decimal FinalPrice { get; set; }
 
 
     /// <summary>

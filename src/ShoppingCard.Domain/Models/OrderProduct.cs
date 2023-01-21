@@ -12,13 +12,12 @@ public class OrderProduct : ModelBase
     public Product Product { get; set; }
 
     /// <summary>
-    ///     count of this product in basket
+    ///     count of this product in order
     /// </summary>
     public uint Count { get; set; }
 
     /// <summary>
-    ///     price of all products of this type in a basket
+    ///     price of all products of this type in a order
     /// </summary>
-    [NotMapped]
-    public decimal TotalPrice => Count * Product.Price;
+    public decimal TotalPrice { get; set; }
 }

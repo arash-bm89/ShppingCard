@@ -39,23 +39,23 @@ public class OrderController : BaseController
     /// <summary>
     ///     create order that finalizing the Basket and reserving product for a while
     /// </summary>
-    /// <param name="cachedBasketId">cachedBasket id that going to use for getting products of cachedBasket</param>
+    /// <param name="basketId">Basket id that going to use for getting products of cachedBasket</param>
     /// <returns></returns>
     [HttpPost]
     [ProducesResponseType(StatusCodes.Status200OK)]
-    public async Task<ActionResult<Guid>> Create([FromQuery] Guid cachedBasketId)
+    public async Task<ActionResult<Guid>> Create([FromQuery] Guid basketId)
     {
-        var cachedBasket = await _cachingService.GetCachedBasketByIdAsync(cachedBasketId);
+        var cachedBasket = await _cachingService.GetCachedBasketByIdAsync(basketId);
 
         // checking if basket is available
-        if (cachedBasket == null) return NotFound($"CachedBasket with id: {cachedBasketId} not found.");
+        if (cachedBasket == null) return NotFound($"CachedBasket with id: {basketId} not found.");
 
 
         var cachedProducts = _cachingService.GetAllCachedProducts(cachedBasket);
 
         // check if cacheBasket has any values
         if (cachedProducts == null || !cachedProducts.Any())
-            return BadRequest($"cachedBasket with id: {cachedBasketId} is empty");
+            return BadRequest($"cachedBasket with id: {basketId} is empty");
 
         // getting paginatedResult of products that cachedBasket contains
         var paginateProducts = await _productRepository.GetListAsync(new ProductFilter
@@ -68,10 +68,10 @@ public class OrderController : BaseController
         var products = paginateProducts.Items;
 
         // creating main basket object that is going to initialize with cacheBasket products
-        var newBasket = new Order();
-
-        // NOTE: after calling this method and creating a new basket in database, newBasket.Id will initialized
-        await _orderRepository.CreateAsync(newBasket, HttpContext.RequestAborted);
+        var newOrder = new Order()
+        {
+            Id = Guid.NewGuid(),
+        };
 
         // creating basketProducts object that is going to use for createRange of basketProduct database
         var basketProducts = new List<OrderProduct>();
@@ -90,24 +90,28 @@ public class OrderController : BaseController
 
             basketProducts.Add(new OrderProduct
             {
-                OrderId = newBasket.Id,
+                OrderId = newOrder.Id,
                 ProductId = product.Id,
-                Count = cachedProductCountWithSameId
+                Count = cachedProductCountWithSameId,
+                TotalPrice = product.Price * cachedProductCountWithSameId,
             });
+            newOrder.FinalPrice += (product.Price * cachedProductCountWithSameId);
         }
 
         // checking if none of the cachedProducts has non-valid counts of products, return a badrequest to the client
         if (basketProducts.Count == 0)
         {
-            await _orderRepository.DeleteAsync(newBasket, HttpContext.RequestAborted);
-            return BadRequest($"None of the products in cacheBasket with id:{cachedBasketId} has invalid counts");
+            return BadRequest($"None of the products in cacheBasket with id:{basketId} has invalid counts");
         }
 
         await _productRepository.UpdateRangeAsync(products, HttpContext.RequestAborted);
 
+        // updating finalPrice of newBasket in the database
+        await _orderRepository.CreateAsync(newOrder, HttpContext.RequestAborted);
+
         await _orderProductRepository.CreateRangeAsync(basketProducts, HttpContext.RequestAborted);
 
-        return Ok(newBasket.Id);
+        return Ok(newOrder.Id);
     }
 
 

@@ -12,12 +12,12 @@ namespace ShoppingCard.Api.Controllers;
 /// </summary>
 [Route("Basket")]
 [ApiController]
-public class CacheBasketController : ControllerBase
+public class BasketController : ControllerBase
 {
     private readonly ICachedBasketService _cachedBasketService;
     private readonly IProductRepository _productRepository;
 
-    public CacheBasketController(ICacheHelper cacheHelper, IProductRepository productRepository,
+    public BasketController(ICacheHelper cacheHelper, IProductRepository productRepository,
         ICachedBasketService cachedBasketService)
     {
         _productRepository = productRepository;
@@ -35,6 +35,7 @@ public class CacheBasketController : ControllerBase
         var id = await _cachedBasketService.CreateCachedBasketAsync();
         return Ok(id);
     }
+
 
     /// <summary>
     ///     get Basket
@@ -55,6 +56,7 @@ public class CacheBasketController : ControllerBase
 
         return Ok(cachedBasketDto);
     }
+
 
     /// <summary>
     ///     get Product of a Basket
@@ -91,7 +93,7 @@ public class CacheBasketController : ControllerBase
     /// <param name="productId"></param>
     /// <param name="count">null means it will be increased by one and 0 will redirected to DeleteAction</param>
     /// <returns></returns>
-    [HttpPut("{id:guid}/products/{productId:guid}/")]
+    [HttpPost("{id:guid}/products/{productId:guid}/")]
     public async Task<IActionResult> UpdateProductInBasketCache(
         [FromRoute] Guid id,
         [FromRoute] Guid productId,
@@ -148,12 +150,14 @@ public class CacheBasketController : ControllerBase
         return Ok();
     }
 
+
     /// <summary>
     ///     delete a Product from the Basket
     /// </summary>
     /// <param name="id"></param>
     /// <param name="productId"></param>
     /// <returns></returns>
+    [ActionName("DeleteProduct")]
     [HttpDelete("{id:guid}/products/{productId}", Name = "DeleteProduct")]
     public async Task<IActionResult> DeleteCacheProduct(
         [FromRoute] Guid id,
