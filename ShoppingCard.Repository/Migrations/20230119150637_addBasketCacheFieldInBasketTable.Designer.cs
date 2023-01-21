@@ -212,7 +212,7 @@ namespace ShoppingCard.Repository.Migrations
                         .HasMaxLength(50)
                         .HasColumnType("character varying(50)");
 
-                    b.Property<long>("Stock")
+                    b.Property<long>("Count")
                         .HasColumnType("bigint");
 
                     b.Property<decimal>("Price")

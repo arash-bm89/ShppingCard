@@ -1,35 +1,29 @@
 ﻿using Common.Models;
-using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using Microsoft.EntityFrameworkCore;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
-namespace Common.ModelConfigurations
+namespace Common.ModelConfigurations;
+
+public abstract class ModelBaseConfiguration<TEntity> : IEntityTypeConfiguration<TEntity> where TEntity : ModelBase
 {
-    public abstract class ModelBaseConfiguration<TEntity> : IEntityTypeConfiguration<TEntity> where TEntity : ModelBase
+    public void Configure(EntityTypeBuilder<TEntity> builder)
     {
-        public void Configure(EntityTypeBuilder<TEntity> builder)
-        {
-            //builder.Property(x => x.Version).HasColumnName("Version");
-            builder.HasIndex(x => x.SeqId).IsUnique(true);
-            builder.Property(x => x.SeqId).UseIdentityColumn().ValueGeneratedOnAdd();
+        //builder.Property(x => x.Version).HasColumnName("Version");
+        builder.HasIndex(x => x.SeqId).IsUnique();
+        builder.Property(x => x.SeqId).UseIdentityColumn().ValueGeneratedOnAdd();
 
-            builder.HasKey(x => x.Id);
-            builder.Property(x => x.Id).IsRequired().ValueGeneratedNever();
+        builder.HasKey(x => x.Id);
+        builder.Property(x => x.Id).IsRequired().ValueGeneratedNever();
 
-            builder.Property(x => x.Version).IsRowVersion();
+        builder.Property(x => x.Version).IsRowVersion();
 
-            builder.Property(x => x.IsDeleted).HasDefaultValue(false);
-            builder.HasQueryFilter(x => (!x.IsDeleted));
+        builder.Property(x => x.IsDeleted).HasDefaultValue(false);
+        builder.HasQueryFilter(x => !x.IsDeleted);
 
-            builder.Property(x => x.CreatedAt).ValueGeneratedOnAdd().HasDefaultValueSql("NOW()");
+        builder.Property(x => x.CreatedAt).ValueGeneratedOnAdd().HasDefaultValueSql("NOW()");
 
-            this.DerivedConfigure(builder);
-        }
-
-        public abstract void DerivedConfigure(EntityTypeBuilder<TEntity> builder);
+        DerivedConfigure(builder);
     }
+
+    public abstract void DerivedConfigure(EntityTypeBuilder<TEntity> builder);
 }

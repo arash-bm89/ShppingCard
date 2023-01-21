@@ -1,14 +1,7 @@
 using Athena.CacheHelper;
-using Common.Implementations;
-using Common.Interfaces;
-using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json;
 using ShoppingCard.Api.Configurations;
 using ShoppingCard.Api.ExtensionMethods;
-using ShoppingCard.Domain.Interfaces;
-using ShoppingCard.Domain.Models;
-using ShoppingCard.Repository;
-using ShoppingCard.Repository.Implementations;
 
 // todo: implement exceptionMiddleware
 // todo: implement actionFilters

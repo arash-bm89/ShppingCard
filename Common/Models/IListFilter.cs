@@ -1,15 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿namespace Common.Models;
 
-namespace Common.Models
+public interface IListFilter
 {
-    public interface IListFilter
-    {
-        int Offset { get; set; }
-        int Count { get; set; }
-
-    }
+    int Offset { get; set; }
+    int Count { get; set; }
 }

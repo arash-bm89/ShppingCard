@@ -1,7 +1,5 @@
-﻿namespace ShoppingCard.Api.Models
-{
-    public class BasketRequest
-    {
+﻿namespace ShoppingCard.Api.Models;
 
-    }
+public class BasketRequest
+{
 }

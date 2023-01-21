@@ -1,16 +1,14 @@
 ﻿using ShoppingCard.Domain.Models;
-using System.ComponentModel.DataAnnotations.Schema;
 
-namespace ShoppingCard.Api.Models
+namespace ShoppingCard.Api.Models;
+
+public class BasketResponse
 {
-    public class BasketResponse
-    {
-        public ICollection<Payment>? Payments { get; set; }
+    public ICollection<Payment>? Payments { get; set; }
 
-        public Payment? ConfirmedPayment => Payments?.SingleOrDefault(x => x.IsConfirmed);
+    public Payment? ConfirmedPayment => Payments?.SingleOrDefault(x => x.IsConfirmed);
 
-        public ICollection<BasketProductResponse> BasketProducts { get; set; }
+    public ICollection<BasketProductResponse> Products { get; set; }
 
-        public decimal? FinalPrice => BasketProducts?.ToList().Sum(x => x.BasketProductPrice);
-    }
+    public decimal? FinalPrice => Products?.ToList().Sum(x => x.BasketProductPrice);
 }

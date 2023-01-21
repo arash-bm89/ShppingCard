@@ -18,7 +18,7 @@ namespace ShoppingCard.Repository.Migrations
             migrationBuilder.RenameColumn(
                 name: "NumberOfAvailable",
                 table: "Products",
-                newName: "Stock");
+                newName: "Count");
         }
 
         /// <inheritdoc />

@@ -218,7 +218,7 @@ namespace ShoppingCard.Repository.Migrations
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<long>("SeqId"));
 
-                    b.Property<long>("Stock")
+                    b.Property<long>("Count")
                         .HasColumnType("bigint");
 
                     b.Property<uint>("Version")

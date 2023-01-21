@@ -1,20 +1,13 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using AutoMapper;
+﻿namespace Common.Models;
 
-namespace Common.Models
-{
-    public class PaginatedResult<TModelBase> 
+public class PaginatedResult<TModelBase>
     where TModelBase : ModelBase
+{
+    public List<TModelBase>? Items { get; set; }
+    public int TotalCount { get; set; }
+
+    public bool HasAnyItems()
     {
-        public List<TModelBase>? Items { get; set; }
-        public int TotalCount { get; set; }
-        public bool HasAnyItems() => Items != null && Items.Count != 0;
-
+        return Items != null && Items.Count != 0;
     }
-
-    
 }
