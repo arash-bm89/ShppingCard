@@ -7,7 +7,7 @@
 	<members>
 		<member name="T:ShoppingCard.Api.Controllers.BasketController">
 			<summary>
-				using for actions of final basketRepository
+				using for actions of final orderRepository
 			</summary>
 		</member>
 		<member name="M:ShoppingCard.Api.Controllers.BasketController.Get(System.Guid)">
@@ -132,12 +132,12 @@
 		</member>
 		<member name="P:ShoppingCard.Api.Models.BasketProductRequest.CountOfProduct">
 			<summary>
-				count of this productRepository in basketRepository
+				count of this productRepository in orderRepository
 			</summary>
 		</member>
 		<member name="P:ShoppingCard.Api.Models.BasketProductResponse.CountOfProduct">
 			<summary>
-				count of this productRepository in basketRepository
+				count of this productRepository in orderRepository
 			</summary>
 		</member>
 	</members>

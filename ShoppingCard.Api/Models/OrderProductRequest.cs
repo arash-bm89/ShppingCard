@@ -2,7 +2,7 @@
 
 namespace ShoppingCard.Api.Models;
 
-public class BasketProductRequest
+public class OrderProductRequest
 {
     [Required] public Guid ProductId { get; set; }
 

@@ -19,9 +19,9 @@ public static class AddServicesExtensionMethods
 
     public static void AddRepositories(this IServiceCollection services)
     {
-        services.AddScoped<IBasketRepository, BasketRepository>();
+        services.AddScoped<IOrderRepository, OrderRepository>();
         services.AddScoped<IProductRepository, ProductRepository>();
-        services.AddScoped<IBasketProductRepository, BasketProductRepository>();
+        services.AddScoped<IOrderProductRepository, OrderProductRepository>();
         services.AddScoped<ICachedBasketService, CachedBasketService>();
     }
 }

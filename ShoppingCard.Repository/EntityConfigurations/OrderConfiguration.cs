@@ -5,14 +5,14 @@ using ShoppingCard.Domain.Models;
 
 namespace ShoppingCard.Repository.EntityConfigurations;
 
-public class BasketConfiguration : ModelBaseConfiguration<Basket>
+public class OrderConfiguration : ModelBaseConfiguration<Order>
 {
-    public override void DerivedConfigure(EntityTypeBuilder<Basket> builder)
+    public override void DerivedConfigure(EntityTypeBuilder<Order> builder)
     {
         builder.Property(x => x.Version);
         builder.HasMany(x => x.Payments)
-            .WithOne(x => x.Basket)
-            .HasForeignKey(x => x.BasketId)
+            .WithOne(x => x.Order)
+            .HasForeignKey(x => x.OrderId)
             .OnDelete(DeleteBehavior.Restrict);
     }
 }

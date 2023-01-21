@@ -2,9 +2,9 @@
 
 namespace ShoppingCard.Api.Models;
 
-public class BasketProductResponse
+public class OrderProductResponse
 {
-    public Guid BasketId { get; set; }
+    public Guid OrderId { get; set; }
 
     public Guid ProductId { get; set; }
 
@@ -20,5 +20,5 @@ public class BasketProductResponse
     ///     price of all products of this type in a basket
     /// </summary>
     [NotMapped]
-    public decimal BasketProductPrice => Count * Product.Price;
+    public decimal TotalPrice => Count * Product.Price;
 }

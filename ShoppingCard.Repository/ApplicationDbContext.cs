@@ -12,9 +12,9 @@ public class ApplicationDbContext : DbContext
     {
     }
 
-    public DbSet<Basket> Baskets { get; set; }
+    public DbSet<Order> Baskets { get; set; }
     public DbSet<Product> Products { get; set; }
-    public DbSet<BasketProduct> BasketProducts { get; set; }
+    public DbSet<OrderProduct> OrderProducts { get; set; }
     public DbSet<Payment> Payments { get; set; }
 
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
@@ -26,8 +26,8 @@ public class ApplicationDbContext : DbContext
     {
         base.OnModelCreating(modelBuilder);
 
-        modelBuilder.ApplyConfiguration(new BasketProductConfiguration());
-        modelBuilder.ApplyConfiguration(new BasketConfiguration());
+        modelBuilder.ApplyConfiguration(new OrderProductConfiguration());
+        modelBuilder.ApplyConfiguration(new OrderConfiguration());
         modelBuilder.ApplyConfiguration(new ProductConfiguration());
         modelBuilder.ApplyConfiguration(new PaymentConfiguration());
     }

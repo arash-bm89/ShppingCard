@@ -3,10 +3,11 @@ using Common.Models;
 
 namespace ShoppingCard.Domain.Models;
 
-public class BasketProduct : ModelBase
+[Table("OrderProduct")]
+public class OrderProduct : ModelBase
 {
-    public Guid BasketId { get; set; }
-    public Basket Basket { get; set; }
+    public Guid OrderId { get; set; }
+    public Order Order { get; set; }
     public Guid ProductId { get; set; }
     public Product Product { get; set; }
 

@@ -4,6 +4,7 @@ using Common.Models;
 
 namespace ShoppingCard.Domain.Models;
 
+[Table("Product")]
 public class Product : ModelBase
 {
     /// <summary>
@@ -33,8 +34,8 @@ public class Product : ModelBase
     [MaxLength(100)] public string? ImageUrl { get; set; }
 
     /// <summary>
-    ///     using for many to many relationship between basket and product
+    ///     using for many to many relationship between order and product
     /// </summary>
 
-    public ICollection<BasketProduct> BasketProducts { get; set; }
+    public ICollection<OrderProduct> OrderProducts { get; set; }
 }

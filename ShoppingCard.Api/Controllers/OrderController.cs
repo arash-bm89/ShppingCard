@@ -10,34 +10,34 @@ using ShoppingCard.Service.IServices;
 namespace ShoppingCard.Api.Controllers;
 
 /// <summary>
-///     using for actions of final basketRepository
+///     using for actions of final orderRepository
 /// </summary>
 [ApiController]
-[Route("baskets")]
-public class BasketController : BaseController
+[Route("orders")]
+public class OrderController : BaseController
 {
-    private readonly IBasketProductRepository _basketProductRepository;
-    private readonly IBasketRepository _basketRepository;
+    private readonly IOrderProductRepository _orderProductRepository;
+    private readonly IOrderRepository _orderRepository;
     private readonly ICachedBasketService _cachingService;
     private readonly IMapper _mapper;
     private readonly IProductRepository _productRepository;
 
-    public BasketController(IBasketRepository basketRepository,
+    public OrderController(IOrderRepository orderRepository,
         IMapper mapper,
-        IBasketProductRepository basketProductRepository,
+        IOrderProductRepository orderProductRepository,
         ICachedBasketService cachingService,
         IProductRepository productRepository)
     {
-        _basketRepository = basketRepository;
+        _orderRepository = orderRepository;
         _mapper = mapper;
-        _basketProductRepository = basketProductRepository;
+        _orderProductRepository = orderProductRepository;
         _cachingService = cachingService;
         _productRepository = productRepository;
     }
 
 
     /// <summary>
-    ///     create basket that finalizing the cachedBasket and reserving product for a while
+    ///     create order that finalizing the Basket and reserving product for a while
     /// </summary>
     /// <param name="cachedBasketId">cachedBasket id that going to use for getting products of cachedBasket</param>
     /// <returns></returns>
@@ -68,13 +68,13 @@ public class BasketController : BaseController
         var products = paginateProducts.Items;
 
         // creating main basket object that is going to initialize with cacheBasket products
-        var newBasket = new Basket();
+        var newBasket = new Order();
 
         // NOTE: after calling this method and creating a new basket in database, newBasket.Id will initialized
-        await _basketRepository.CreateAsync(newBasket, HttpContext.RequestAborted);
+        await _orderRepository.CreateAsync(newBasket, HttpContext.RequestAborted);
 
         // creating basketProducts object that is going to use for createRange of basketProduct database
-        var basketProducts = new List<BasketProduct>();
+        var basketProducts = new List<OrderProduct>();
 
         foreach (var product in products)
         {
@@ -88,9 +88,9 @@ public class BasketController : BaseController
             // this changing will updating the rows in the database using Update method later
             product.Stock -= cachedProductCountWithSameId;
 
-            basketProducts.Add(new BasketProduct
+            basketProducts.Add(new OrderProduct
             {
-                BasketId = newBasket.Id,
+                OrderId = newBasket.Id,
                 ProductId = product.Id,
                 Count = cachedProductCountWithSameId
             });
@@ -99,38 +99,38 @@ public class BasketController : BaseController
         // checking if none of the cachedProducts has non-valid counts of products, return a badrequest to the client
         if (basketProducts.Count == 0)
         {
-            await _basketRepository.DeleteAsync(newBasket, HttpContext.RequestAborted);
+            await _orderRepository.DeleteAsync(newBasket, HttpContext.RequestAborted);
             return BadRequest($"None of the products in cacheBasket with id:{cachedBasketId} has invalid counts");
         }
 
         await _productRepository.UpdateRangeAsync(products, HttpContext.RequestAborted);
 
-        await _basketProductRepository.CreateRangeAsync(basketProducts, HttpContext.RequestAborted);
+        await _orderProductRepository.CreateRangeAsync(basketProducts, HttpContext.RequestAborted);
 
         return Ok(newBasket.Id);
     }
 
 
     /// <summary>
-    ///     get basket using id
+    ///     get order using id
     /// </summary>
     /// <param name="id"></param>
     /// <returns></returns>
     [HttpGet("{id:guid}")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
-    public async Task<ActionResult<BasketResponse>> Get([FromRoute] Guid id)
+    public async Task<ActionResult<OrderResponse>> Get([FromRoute] Guid id)
     {
-        var basket = await _basketRepository.GetAsync(id, HttpContext.RequestAborted);
+        var basket = await _orderRepository.GetAsync(id, HttpContext.RequestAborted);
 
         if (basket == null) return NotFound($"basket with id: {id} not found.");
 
-        return Ok(_mapper.Map<Basket, BasketResponse>(basket));
+        return Ok(_mapper.Map<Order, OrderResponse>(basket));
     }
 
 
     /// <summary>
-    ///     delete basket using id
+    ///     delete order using id
     /// </summary>
     /// <param name="id"></param>
     /// <returns></returns>
@@ -139,7 +139,7 @@ public class BasketController : BaseController
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<IActionResult> DeleteBasket([FromRoute] Guid id)
     {
-        var basket = await _basketRepository.GetAsync(id, HttpContext.RequestAborted);
+        var basket = await _orderRepository.GetAsync(id, HttpContext.RequestAborted);
 
         if (basket == null) return NotFound();
 
@@ -155,17 +155,17 @@ public class BasketController : BaseController
             .UpdateRangeAsync(basket.Products.Select(x => x.Product).ToList(), HttpContext.RequestAborted);
 
         // deleting basket products of the basket in the database
-        await _basketProductRepository.DeleteRangeAsync(basket.Products.ToList(), HttpContext.RequestAborted);
+        await _orderProductRepository.DeleteRangeAsync(basket.Products.ToList(), HttpContext.RequestAborted);
 
         // deleting basket form the database
-        await _basketRepository.DeleteAsync(basket, HttpContext.RequestAborted);
+        await _orderRepository.DeleteAsync(basket, HttpContext.RequestAborted);
 
         return Ok();
     }
 
 
     /// <summary>
-    ///     get a basketProduct using id
+    ///     get a orderProduct using id
     /// </summary>
     /// <param name="id"></param>
     /// <param name="productId"></param>
@@ -173,25 +173,25 @@ public class BasketController : BaseController
     [HttpGet("{id:guid}/products/{productId:guid}")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
-    public async Task<ActionResult<BasketProductResponse>> GetBasketProductInfo([FromRoute] Guid id,
+    public async Task<ActionResult<OrderProductResponse>> GetBasketProductInfo([FromRoute] Guid id,
         [FromRoute] Guid productId)
     {
-        var basket = await _basketRepository.GetAsync(id, HttpContext.RequestAborted);
+        var basket = await _orderRepository.GetAsync(id, HttpContext.RequestAborted);
 
-        if (basket == null) return NotFound($"Basket with id: {id} not found");
+        if (basket == null) return NotFound($"Order with id: {id} not found");
 
-        var basketProduct = await _basketProductRepository
+        var basketProduct = await _orderProductRepository
             .GetProductByBasketIdAsync(id, productId, HttpContext.RequestAborted);
 
         if (basketProduct == null)
             return NotFound($"basketProductId with id: {basketProduct} not found");
 
-        return Ok(_mapper.Map<BasketProduct, BasketProductResponse>(basketProduct));
+        return Ok(_mapper.Map<OrderProduct, OrderProductResponse>(basketProduct));
     }
 
 
     /// <summary>
-    ///     get basketProducts
+    ///     get orderProducts
     /// </summary>
     /// <param name="id"></param>
     /// <param name="offset"></param>
@@ -199,30 +199,30 @@ public class BasketController : BaseController
     /// <param name="productIds"></param>
     /// <returns></returns>
     [HttpGet("{id:guid}/products")]
-    public async Task<ActionResult<PaginatedResponseResult<BasketProductResponse>>> GetBasketProducts(
+    public async Task<ActionResult<PaginatedResponseResult<OrderProductResponse>>> GetBasketProducts(
         [FromRoute] Guid id,
         [FromQuery] int offset = 0,
         [FromQuery] int count = 10,
         [FromQuery] Guid[]? productIds = null)
     {
-        var basket = await _basketRepository.GetAsync(id, HttpContext.RequestAborted);
+        var basket = await _orderRepository.GetAsync(id, HttpContext.RequestAborted);
 
         if (basket == null) return NotFound($"basket with id: {id} not found.");
 
-        var filter = new BasketProductFilter
+        var filter = new OrderProductFilter
         {
             Offset = offset,
             Count = count,
             ProductIds = productIds,
-            BasketId = id
+            OrderId = id
         };
 
-        var paginatedBasketProduct = await _basketProductRepository.GetListAsync(filter, HttpContext.RequestAborted);
+        var paginatedBasketProduct = await _orderProductRepository.GetListAsync(filter, HttpContext.RequestAborted);
 
         if (!paginatedBasketProduct.HasAnyItems()) return NotFound($"No products found for basket with id: {id}");
 
         var paginatedResponseResult = _mapper
-            .Map<PaginatedResponseResult<BasketProductResponse>>(paginatedBasketProduct);
+            .Map<PaginatedResponseResult<OrderProductResponse>>(paginatedBasketProduct);
 
         return Ok(paginatedResponseResult);
     }

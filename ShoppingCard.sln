@@ -16,9 +16,6 @@ EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ShoppingCard.Api", "ShoppingCard.Api\ShoppingCard.Api.csproj", "{3098F56D-34F7-462E-A1D9-7C25ABB6E5A7}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "ShoppingCard", "ShoppingCard", "{9A38E541-4CE6-4360-B510-AA54218E5CC5}"
-	ProjectSection(SolutionItems) = preProject
-		Athena.CacheHelper\ICacheHelper.cs = Athena.CacheHelper\ICacheHelper.cs
-	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Athena", "Athena", "{D65DB6B5-4CD3-4053-A7B7-1DA76658A52E}"
 EndProject

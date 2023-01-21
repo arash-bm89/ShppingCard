@@ -5,17 +5,17 @@ using ShoppingCard.Domain.Models;
 
 namespace ShoppingCard.Repository.EntityConfigurations;
 
-public class BasketProductConfiguration : ModelBaseConfiguration<BasketProduct>
+public class OrderProductConfiguration : ModelBaseConfiguration<OrderProduct>
 {
-    public override void DerivedConfigure(EntityTypeBuilder<BasketProduct> builder)
+    public override void DerivedConfigure(EntityTypeBuilder<OrderProduct> builder)
     {
-        builder.HasOne(x => x.Basket)
+        builder.HasOne(x => x.Order)
             .WithMany(x => x.Products)
-            .HasForeignKey(x => x.BasketId)
+            .HasForeignKey(x => x.OrderId)
             .OnDelete(DeleteBehavior.Cascade);
 
         builder.HasOne(x => x.Product)
-            .WithMany(x => x.BasketProducts)
+            .WithMany(x => x.OrderProducts)
             .HasForeignKey(x => x.ProductId)
             .OnDelete(DeleteBehavior.Restrict);
     }

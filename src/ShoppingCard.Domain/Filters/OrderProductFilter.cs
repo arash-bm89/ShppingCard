@@ -2,7 +2,7 @@
 
 namespace ShoppingCard.Domain.Filters;
 
-public struct BasketProductFilter : IListFilter
+public struct OrderProductFilter : IListFilter
 {
     public int Offset { get; set; }
 
@@ -11,8 +11,8 @@ public struct BasketProductFilter : IListFilter
     public Guid[]? ProductIds { get; set; }
 
     /// <summary>
-    ///     this is going to use for /baskets/{id}/products/list and we gonna use this field to find basketProducts for this
+    ///     this is going to use for /orders/{id}/products/list and we gonna use this field to find orderProducts for this
     ///     basketId
     /// </summary>
-    public Guid? BasketId { get; set; }
+    public Guid? OrderId { get; set; }
 }

@@ -4,6 +4,6 @@ using ShoppingCard.Domain.Models;
 
 namespace ShoppingCard.Domain.Interfaces;
 
-public interface IBasketRepository : IBaseRepository<Basket, BasketFilter>
+public interface IOrderRepository : IBaseRepository<Order, OrderFilter>
 {
 }

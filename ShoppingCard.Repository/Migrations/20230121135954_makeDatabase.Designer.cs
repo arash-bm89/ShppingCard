@@ -12,8 +12,8 @@ using ShoppingCard.Repository;
 namespace ShoppingCard.Repository.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20230119224411_ChangeNumberOfProductsColumnToStock")]
-    partial class ChangeNumberOfProductsColumnToStock
+    [Migration("20230121135954_makeDatabase")]
+    partial class makeDatabase
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -25,7 +25,7 @@ namespace ShoppingCard.Repository.Migrations
 
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
 
-            modelBuilder.Entity("ShoppingCard.Domain.Models.Basket", b =>
+            modelBuilder.Entity("ShoppingCard.Domain.Models.Order", b =>
                 {
                     b.Property<Guid>("Id")
                         .HasColumnType("uuid");
@@ -63,18 +63,15 @@ namespace ShoppingCard.Repository.Migrations
                     b.HasIndex("SeqId")
                         .IsUnique();
 
-                    b.ToTable("Baskets");
+                    b.ToTable("Order");
                 });
 
-            modelBuilder.Entity("ShoppingCard.Domain.Models.BasketProduct", b =>
+            modelBuilder.Entity("ShoppingCard.Domain.Models.OrderProduct", b =>
                 {
                     b.Property<Guid>("Id")
                         .HasColumnType("uuid");
 
-                    b.Property<Guid>("BasketId")
-                        .HasColumnType("uuid");
-
-                    b.Property<long>("CountOfProduct")
+                    b.Property<long>("Count")
                         .HasColumnType("bigint");
 
                     b.Property<DateTimeOffset>("CreatedAt")
@@ -92,6 +89,9 @@ namespace ShoppingCard.Repository.Migrations
 
                     b.Property<DateTimeOffset?>("ModifiedAt")
                         .HasColumnType("timestamp with time zone");
+
+                    b.Property<Guid>("OrderId")
+                        .HasColumnType("uuid");
 
                     b.Property<Guid>("ProductId")
                         .HasColumnType("uuid");
@@ -110,22 +110,19 @@ namespace ShoppingCard.Repository.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("BasketId");
+                    b.HasIndex("OrderId");
 
                     b.HasIndex("ProductId");
 
                     b.HasIndex("SeqId")
                         .IsUnique();
 
-                    b.ToTable("BasketProducts");
+                    b.ToTable("OrderProduct");
                 });
 
             modelBuilder.Entity("ShoppingCard.Domain.Models.Payment", b =>
                 {
                     b.Property<Guid>("Id")
-                        .HasColumnType("uuid");
-
-                    b.Property<Guid>("BasketId")
                         .HasColumnType("uuid");
 
                     b.Property<DateTimeOffset>("ConfirmedAt")
@@ -153,6 +150,9 @@ namespace ShoppingCard.Repository.Migrations
                     b.Property<DateTimeOffset?>("ModifiedAt")
                         .HasColumnType("timestamp with time zone");
 
+                    b.Property<Guid>("OrderId")
+                        .HasColumnType("uuid");
+
                     b.Property<long>("SeqId")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("bigint");
@@ -167,7 +167,7 @@ namespace ShoppingCard.Repository.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("BasketId");
+                    b.HasIndex("OrderId");
 
                     b.HasIndex("SeqId")
                         .IsUnique();
@@ -218,7 +218,7 @@ namespace ShoppingCard.Repository.Migrations
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<long>("SeqId"));
 
-                    b.Property<long>("Count")
+                    b.Property<long>("Stock")
                         .HasColumnType("bigint");
 
                     b.Property<uint>("Version")
@@ -230,54 +230,55 @@ namespace ShoppingCard.Repository.Migrations
                     b.HasKey("Id");
 
                     b.HasIndex("Name")
-                        .IsUnique();
+                        .IsUnique()
+                        .HasFilter("\"IsDeleted\" = false");
 
                     b.HasIndex("SeqId")
                         .IsUnique();
 
-                    b.ToTable("Products");
+                    b.ToTable("Product");
                 });
 
-            modelBuilder.Entity("ShoppingCard.Domain.Models.BasketProduct", b =>
+            modelBuilder.Entity("ShoppingCard.Domain.Models.OrderProduct", b =>
                 {
-                    b.HasOne("ShoppingCard.Domain.Models.Basket", "Basket")
-                        .WithMany("BasketProducts")
-                        .HasForeignKey("BasketId")
-                        .OnDelete(DeleteBehavior.Restrict)
+                    b.HasOne("ShoppingCard.Domain.Models.Order", "Order")
+                        .WithMany("Products")
+                        .HasForeignKey("OrderId")
+                        .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.HasOne("ShoppingCard.Domain.Models.Product", "Product")
-                        .WithMany("BasketProducts")
+                        .WithMany("OrderProducts")
                         .HasForeignKey("ProductId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
-                    b.Navigation("Basket");
+                    b.Navigation("Order");
 
                     b.Navigation("Product");
                 });
 
             modelBuilder.Entity("ShoppingCard.Domain.Models.Payment", b =>
                 {
-                    b.HasOne("ShoppingCard.Domain.Models.Basket", "Basket")
+                    b.HasOne("ShoppingCard.Domain.Models.Order", "Order")
                         .WithMany("Payments")
-                        .HasForeignKey("BasketId")
+                        .HasForeignKey("OrderId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
-                    b.Navigation("Basket");
+                    b.Navigation("Order");
                 });
 
-            modelBuilder.Entity("ShoppingCard.Domain.Models.Basket", b =>
+            modelBuilder.Entity("ShoppingCard.Domain.Models.Order", b =>
                 {
-                    b.Navigation("BasketProducts");
-
                     b.Navigation("Payments");
+
+                    b.Navigation("Products");
                 });
 
             modelBuilder.Entity("ShoppingCard.Domain.Models.Product", b =>
                 {
-                    b.Navigation("BasketProducts");
+                    b.Navigation("OrderProducts");
                 });
 #pragma warning restore 612, 618
         }
