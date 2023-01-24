@@ -11,12 +11,11 @@ namespace Athena.RabbitMQHelper
 {
     public static class ServiceCollectionExtensions
     {
-        public static void AddRabbit(this IServiceCollection services, IConfigurationSection secrion)
+        public static void AddRabbit(this IServiceCollection services, IConfigurationSection section)
         {
             services.AddSingleton<IBus>(s => RabbitHutch.CreateBus(
-                secrion.GetValue<string>("Connection")));
+                section.GetValue<string>("Connection")));
         }
-
     }
 
 }

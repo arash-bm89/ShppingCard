@@ -1,0 +1,17 @@
+﻿using System.Net;
+using Athena.RabbitMQHelper;
+using EasyNetQ;
+
+namespace ShoppingCard.BrokerMessage
+{
+    [Queue("Logging", ExchangeName = "Logging")]
+    public class LogMessage : Message
+    {
+        public string Ip { get; set; }
+        public string Body { get; set; }
+        public string ResponseStatusCode { get; set; }
+        public string HttpMethod { get; set; }
+        public bool HasException { get; set; }
+        public string ErrorMessage { get; set; }
+    }
+}

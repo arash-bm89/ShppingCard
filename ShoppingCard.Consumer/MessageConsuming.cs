@@ -8,9 +8,4 @@ using EasyNetQ;
 
 namespace ShoppingCard.Consumer
 {
-    [Queue("message", ExchangeName = "message")]
-    public class MessageConsuming : Message
-    {
-        public string Text { get; set; }
-    }
 }
