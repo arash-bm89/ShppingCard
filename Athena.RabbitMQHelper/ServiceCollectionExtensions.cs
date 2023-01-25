@@ -13,6 +13,7 @@ namespace Athena.RabbitMQHelper
     {
         public static void AddRabbit(this IServiceCollection services, IConfigurationSection section)
         {
+            var test = section.GetValue<string>("Rabbit");
             services.AddSingleton<IBus>(s => RabbitHutch.CreateBus(
                 section.GetValue<string>("Connection")));
         }

@@ -43,6 +43,7 @@ public class BasketController : ControllerBase
     /// <param name="id"></param>
     /// <returns></returns>
     [HttpGet("{id:guid}")]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<ActionResult<CachedBasketDto>> GetCachedBasket([FromRoute] Guid id)
     {
         var cachedBasket = await _cachedBasketService.GetCachedBasketByIdAsync(id);

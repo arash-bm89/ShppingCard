@@ -21,6 +21,18 @@ public class Order : ModelBase
 
 
     /// <summary>
+    /// foreign key of userId
+    /// </summary>
+    public Guid UserId { get; set; }
+
+
+    /// <summary>
+    /// navigation property of the user profile
+    /// </summary>
+    public User User { get; set; }
+
+
+    /// <summary>
     ///     using for many to many relationship between order and product
     /// </summary>
     public ICollection<OrderProduct> Products { get; set; }

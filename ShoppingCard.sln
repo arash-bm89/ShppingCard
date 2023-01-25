@@ -25,9 +25,9 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Athena.RabbitMQHelper", "At
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ShoppingCard.Consumer", "ShoppingCard.Consumer\ShoppingCard.Consumer.csproj", "{09A98EF7-3276-4007-B21D-3A536ED47CE7}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ShoppingCard.ConsumerTesting", "ShoppingCard.ConsumerTesting\ShoppingCard.ConsumerTesting.csproj", "{36EF6BA5-F73C-4A02-8FE9-AAEE7BC2B601}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ShoppingCard.BrokerMessage", "ShoppingCard.BrokerMessage\ShoppingCard.BrokerMessage.csproj", "{999DE638-2F62-44F2-8E70-861D041BDCAD}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ShoppingCard.BrokerMessage", "ShoppingCard.BrokerMessage\ShoppingCard.BrokerMessage.csproj", "{999DE638-2F62-44F2-8E70-861D041BDCAD}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Athena.AspDotnetHelper", "Athena.AspDotnetHelper\Athena.AspDotnetHelper.csproj", "{296F43C6-9767-46B5-8757-26E48427F241}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -67,14 +67,14 @@ Global
 		{09A98EF7-3276-4007-B21D-3A536ED47CE7}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{09A98EF7-3276-4007-B21D-3A536ED47CE7}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{09A98EF7-3276-4007-B21D-3A536ED47CE7}.Release|Any CPU.Build.0 = Release|Any CPU
-		{36EF6BA5-F73C-4A02-8FE9-AAEE7BC2B601}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{36EF6BA5-F73C-4A02-8FE9-AAEE7BC2B601}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{36EF6BA5-F73C-4A02-8FE9-AAEE7BC2B601}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{36EF6BA5-F73C-4A02-8FE9-AAEE7BC2B601}.Release|Any CPU.Build.0 = Release|Any CPU
 		{999DE638-2F62-44F2-8E70-861D041BDCAD}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{999DE638-2F62-44F2-8E70-861D041BDCAD}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{999DE638-2F62-44F2-8E70-861D041BDCAD}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{999DE638-2F62-44F2-8E70-861D041BDCAD}.Release|Any CPU.Build.0 = Release|Any CPU
+		{296F43C6-9767-46B5-8757-26E48427F241}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{296F43C6-9767-46B5-8757-26E48427F241}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{296F43C6-9767-46B5-8757-26E48427F241}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{296F43C6-9767-46B5-8757-26E48427F241}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -90,8 +90,8 @@ Global
 		{15732843-7E7D-4D0A-A071-117422EEBE7B} = {D65DB6B5-4CD3-4053-A7B7-1DA76658A52E}
 		{BF7E5487-4C2F-404C-9E5C-00A220AF8087} = {D65DB6B5-4CD3-4053-A7B7-1DA76658A52E}
 		{09A98EF7-3276-4007-B21D-3A536ED47CE7} = {9A38E541-4CE6-4360-B510-AA54218E5CC5}
-		{36EF6BA5-F73C-4A02-8FE9-AAEE7BC2B601} = {9A38E541-4CE6-4360-B510-AA54218E5CC5}
 		{999DE638-2F62-44F2-8E70-861D041BDCAD} = {9A38E541-4CE6-4360-B510-AA54218E5CC5}
+		{296F43C6-9767-46B5-8757-26E48427F241} = {D65DB6B5-4CD3-4053-A7B7-1DA76658A52E}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {0411D75C-EA21-4B59-8113-BFC5389A3AF1}

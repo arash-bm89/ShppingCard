@@ -7,16 +7,28 @@ using Microsoft.Extensions.Hosting;
 
 namespace Athena.RabbitMQHelper
 {
-    public class BaseConsumerHostedService : IHostedService
+    public class BaseConsumerHostedService<TMessage> : IHostedService
+    where TMessage : Message, new()
     {
-        public async Task StartAsync(CancellationToken cancellationToken)
+        private readonly IAsyncJobConsumer<TMessage> _consumer;
+
+        public BaseConsumerHostedService(IAsyncJobConsumer<TMessage> consumer)
         {
-            throw new NotImplementedException();
+            _consumer = consumer;
         }
 
-        public async Task StopAsync(CancellationToken cancellationToken)
+        public Task StartAsync(CancellationToken cancellationToken)
         {
-            throw new NotImplementedException();
+            _consumer.Subscribe();
+
+            return Task.CompletedTask;
+        }
+
+        public Task StopAsync(CancellationToken cancellationToken)
+        {
+            _consumer.Dispose();
+
+            return Task.CompletedTask;
         }
     }
 }

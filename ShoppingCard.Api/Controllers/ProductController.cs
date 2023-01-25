@@ -135,6 +135,7 @@ public class ProductController : BaseController
         bool? isAvailable = null
     )
     {
+        throw new Exception("this is an error");
         var paginatedProducts = await _productRepository
             .GetListAsync(new ProductFilter
             {
