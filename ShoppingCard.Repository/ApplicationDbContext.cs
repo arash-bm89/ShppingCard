@@ -16,6 +16,7 @@ public class ApplicationDbContext : DbContext
     public DbSet<Product> Products { get; set; }
     public DbSet<OrderProduct> OrderProducts { get; set; }
     public DbSet<Payment> Payments { get; set; }
+    public DbSet<User> Users { get; set; }
 
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
     {
@@ -30,5 +31,6 @@ public class ApplicationDbContext : DbContext
         modelBuilder.ApplyConfiguration(new OrderConfiguration());
         modelBuilder.ApplyConfiguration(new ProductConfiguration());
         modelBuilder.ApplyConfiguration(new PaymentConfiguration());
+        modelBuilder.ApplyConfiguration(new UserConfiguration());
     }
 }
