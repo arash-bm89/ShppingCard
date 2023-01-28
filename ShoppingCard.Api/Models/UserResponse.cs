@@ -1,9 +1,8 @@
-﻿namespace ShoppingCard.Api.Models
+﻿namespace ShoppingCard.Api.Models;
+
+public class UserResponse
 {
-    public class UserResponse
-    {
-        public Guid Id { get; set; }
-        public string Name { get; set; }
-        public string Email { get; set; }
-    }
+    public Guid Id { get; set; }
+    public string Name { get; set; }
+    public string Email { get; set; }
 }

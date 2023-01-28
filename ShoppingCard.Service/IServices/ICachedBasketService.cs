@@ -12,7 +12,6 @@ public interface ICachedBasketService
     Task<CachedBasketDto> GetProductsFromRepositoryAsync(CachedBasket basket, CancellationToken cancellationToken);
     Task<CachedProductDto> GetProductFromRepositoryAsync(CachedProduct product, CancellationToken cancellationToken);
     Task StoreAsync(Guid id, CachedBasket basket);
-    void AddCachedProductToBasket(CachedBasket basket, CachedProduct product);
     void AddCachedProductToBasket(CachedBasket basket, Guid productId, uint count);
     void DeleteCachedProductInBasket(CachedBasket basket, CachedProduct product);
 
@@ -21,5 +20,7 @@ public interface ICachedBasketService
     void ApplyCountInCachedProduct(CachedProduct product, uint count);
     void ApplyIncrementByOneToCachedProduct(CachedProduct product);
 
-    Task<Guid> CreateCachedBasketAsync();
+    Task<Guid> CreateCachedBasketAsync(Guid userId);
+
+    Task<bool> HasAnyByIdAsync(Guid id);
 }

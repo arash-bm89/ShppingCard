@@ -24,7 +24,7 @@ namespace ShoppingCard.Repository.Migrations
 
             modelBuilder.Entity("ShoppingCard.Domain.Models.Order", b =>
                 {
-                    b.Property<Guid>("Id")
+                    b.Property<Guid>("UserId")
                         .HasColumnType("uuid");
 
                     b.Property<DateTimeOffset>("CreatedAt")
@@ -61,7 +61,7 @@ namespace ShoppingCard.Repository.Migrations
                         .HasColumnType("xid")
                         .HasColumnName("xmin");
 
-                    b.HasKey("Id");
+                    b.HasKey("UserId");
 
                     b.HasIndex("SeqId")
                         .IsUnique();
@@ -73,7 +73,7 @@ namespace ShoppingCard.Repository.Migrations
 
             modelBuilder.Entity("ShoppingCard.Domain.Models.OrderProduct", b =>
                 {
-                    b.Property<Guid>("Id")
+                    b.Property<Guid>("UserId")
                         .HasColumnType("uuid");
 
                     b.Property<long>("Count")
@@ -116,7 +116,7 @@ namespace ShoppingCard.Repository.Migrations
                         .HasColumnType("xid")
                         .HasColumnName("xmin");
 
-                    b.HasKey("Id");
+                    b.HasKey("UserId");
 
                     b.HasIndex("OrderId");
 
@@ -130,7 +130,7 @@ namespace ShoppingCard.Repository.Migrations
 
             modelBuilder.Entity("ShoppingCard.Domain.Models.Payment", b =>
                 {
-                    b.Property<Guid>("Id")
+                    b.Property<Guid>("UserId")
                         .HasColumnType("uuid");
 
                     b.Property<DateTimeOffset>("ConfirmedAt")
@@ -173,7 +173,7 @@ namespace ShoppingCard.Repository.Migrations
                         .HasColumnType("xid")
                         .HasColumnName("xmin");
 
-                    b.HasKey("Id");
+                    b.HasKey("UserId");
 
                     b.HasIndex("OrderId");
 
@@ -185,7 +185,7 @@ namespace ShoppingCard.Repository.Migrations
 
             modelBuilder.Entity("ShoppingCard.Domain.Models.Product", b =>
                 {
-                    b.Property<Guid>("Id")
+                    b.Property<Guid>("UserId")
                         .HasColumnType("uuid");
 
                     b.Property<DateTimeOffset>("CreatedAt")
@@ -235,7 +235,7 @@ namespace ShoppingCard.Repository.Migrations
                         .HasColumnType("xid")
                         .HasColumnName("xmin");
 
-                    b.HasKey("Id");
+                    b.HasKey("UserId");
 
                     b.HasIndex("Name")
                         .IsUnique()
@@ -249,7 +249,7 @@ namespace ShoppingCard.Repository.Migrations
 
             modelBuilder.Entity("ShoppingCard.Domain.Models.User", b =>
                 {
-                    b.Property<Guid>("Id")
+                    b.Property<Guid>("UserId")
                         .HasColumnType("uuid");
 
                     b.Property<DateTimeOffset>("CreatedAt")
@@ -292,7 +292,7 @@ namespace ShoppingCard.Repository.Migrations
                         .HasColumnType("xid")
                         .HasColumnName("xmin");
 
-                    b.HasKey("Id");
+                    b.HasKey("UserId");
 
                     b.HasIndex("Email")
                         .IsUnique();

@@ -67,7 +67,7 @@ namespace ShoppingCard.Repository.Migrations
                 table: "Order",
                 column: "UserId",
                 principalTable: "Users",
-                principalColumn: "Id",
+                principalColumn: "UserId",
                 onDelete: ReferentialAction.Cascade);
         }
 

@@ -5,11 +5,10 @@ using System.Text;
 using System.Threading.Tasks;
 using Common.Models;
 
-namespace ShoppingCard.Domain.Filters
+namespace ShoppingCard.Domain.Filters;
+
+public struct UserFilter : IListFilter
 {
-    public struct UserFilter : IListFilter
-    {
-        public int Offset { get; set; }
-        public int Count { get; set; }
-    }
+    public int Offset { get; set; }
+    public int Count { get; set; }
 }

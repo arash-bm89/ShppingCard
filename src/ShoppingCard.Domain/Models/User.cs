@@ -6,19 +6,17 @@ using System.Text;
 using System.Threading.Tasks;
 using Common.Models;
 
-namespace ShoppingCard.Domain.Models
+namespace ShoppingCard.Domain.Models;
+
+public class User : ModelBase
 {
-    public class User : ModelBase
-    {
-        public string Name { get; set; }
+    public string Name { get; set; }
 
-        public string Email { get; set; }
+    public string Email { get; set; }
 
-        public string HashedPassword { get; set; }
+    public string HashedPassword { get; set; }
 
-        public ICollection<Order> Orders { get; set; }
+    public ICollection<Order> Orders { get; set; }
 
-        [NotMapped]
-        public ICollection<Payment> Payments => Orders.SelectMany(x => x.Payments).ToList();
-    }
+    [NotMapped] public ICollection<Payment> Payments => Orders.SelectMany(x => x.Payments).ToList();
 }

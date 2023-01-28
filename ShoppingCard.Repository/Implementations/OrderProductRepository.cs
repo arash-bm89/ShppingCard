@@ -34,7 +34,8 @@ public class OrderProductRepository : BaseRepository<OrderProduct, OrderProductF
     protected override IQueryable<OrderProduct> ApplyFilter(IQueryable<OrderProduct> query,
         OrderProductFilter filter)
     {
-        if (filter.ProductIds != null && filter.ProductIds.Any()) query = query.Where(x => filter.ProductIds.Contains(x.ProductId));
+        if (filter.ProductIds != null && filter.ProductIds.Any())
+            query = query.Where(x => filter.ProductIds.Contains(x.ProductId));
 
         if (filter.OrderId != null) query = query.Where(x => x.OrderId == filter.OrderId);
 

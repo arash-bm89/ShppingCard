@@ -70,7 +70,7 @@ public class OrderController : BaseController
         // creating main basket object that is going to initialize with cacheBasket products
         var newOrder = new Order()
         {
-            Id = Guid.NewGuid(),
+            Id = Guid.NewGuid()
         };
 
         // creating basketProducts object that is going to use for createRange of basketProduct database
@@ -93,16 +93,14 @@ public class OrderController : BaseController
                 OrderId = newOrder.Id,
                 ProductId = product.Id,
                 Count = cachedProductCountWithSameId,
-                TotalPrice = product.Price * cachedProductCountWithSameId,
+                TotalPrice = product.Price * cachedProductCountWithSameId
             });
-            newOrder.FinalPrice += (product.Price * cachedProductCountWithSameId);
+            newOrder.FinalPrice += product.Price * cachedProductCountWithSameId;
         }
 
         // checking if none of the cachedProducts has non-valid counts of products, return a badrequest to the client
         if (basketProducts.Count == 0)
-        {
             return BadRequest($"None of the products in cacheBasket with id:{basketId} has invalid counts");
-        }
 
         await _productRepository.UpdateRangeAsync(products, HttpContext.RequestAborted);
 
@@ -149,10 +147,7 @@ public class OrderController : BaseController
 
         var products = basket.Products.Select(x => x.Product);
 
-        foreach (var basketProduct in basket.Products)
-        {
-            basketProduct.Product.Stock += basketProduct.Count;
-        }
+        foreach (var basketProduct in basket.Products) basketProduct.Product.Stock += basketProduct.Count;
 
         // updating stock in the reserved products
         await _productRepository

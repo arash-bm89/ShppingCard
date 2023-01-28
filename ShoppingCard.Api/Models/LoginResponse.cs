@@ -1,7 +1,6 @@
-﻿namespace ShoppingCard.Api.Models
+﻿namespace ShoppingCard.Api.Models;
+
+public class LoginResponse
 {
-    public class LoginResponse
-    {
-        public string Token { get; set; }
-    }
+    public string Token { get; set; }
 }

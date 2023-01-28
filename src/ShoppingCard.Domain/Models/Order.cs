@@ -6,7 +6,6 @@ namespace ShoppingCard.Domain.Models;
 [Table("Order")]
 public class Order : ModelBase
 {
-
     /// <summary>
     ///     using for the confirmed payment for the order
     /// </summary>

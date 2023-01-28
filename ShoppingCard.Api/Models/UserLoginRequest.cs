@@ -1,9 +1,8 @@
-﻿namespace ShoppingCard.Api.Models
-{
-    public class UserLoginRequest
-    {
-        public string Name { get; set; }
+﻿namespace ShoppingCard.Api.Models;
 
-        public string Password { get; set; }
-    }
+public class UserLoginRequest
+{
+    public string Name { get; set; }
+
+    public string Password { get; set; }
 }

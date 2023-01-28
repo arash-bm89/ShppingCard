@@ -1,7 +1,5 @@
-﻿namespace Athena.RabbitMQHelper
-{
-    public abstract class Message
-    {
+﻿namespace Athena.RabbitMQHelper;
 
-    }
+public abstract class Message
+{
 }

@@ -6,14 +6,13 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using ShoppingCard.Service.Models;
 
-namespace ShoppingCard.Service.IServices
+namespace ShoppingCard.Service.IServices;
+
+public interface IJwtService
 {
-    public interface IJwtService
-    {
-        string CreateJwt(Guid id, string name, string key);
+    string CreateJwt(Guid id, string name, string key);
 
-        bool ValidateJwt(string token, string key);
+    bool ValidateJwt(string token, string key);
 
-        JwtObject GetJwtObjectFromTokenPayload(HttpContext context);
-    }
+    JwtObject GetJwtObjectFromHttpContext(HttpContext context);
 }

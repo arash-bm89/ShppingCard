@@ -9,7 +9,7 @@ using ShoppingCard.Consumer.ConsumerHostedServices;
 using ShoppingCard.Consumer.Consumers;
 using ILogger = Microsoft.Extensions.Logging.ILogger;
 
-IHost host = Host.CreateDefaultBuilder(args)
+var host = Host.CreateDefaultBuilder(args)
     .ConfigureHostConfiguration(builder =>
     {
         builder.Sources.Clear();

@@ -7,6 +7,10 @@ using ShoppingCard.Service.IServices;
 
 namespace ShoppingCard.Api.Controllers;
 
+// todo: add fromQuery and... to the actions
+// todo: add "" from some notFound or badRequest responses
+// todo: add logic of user support
+
 /// <summary>
 ///     cacheBasket is the temporary template using for crud operation on the products that user want to buy
 /// </summary>
@@ -17,12 +21,14 @@ public class BasketController : ControllerBase
 {
     private readonly ICachedBasketService _cachedBasketService;
     private readonly IProductRepository _productRepository;
+    private readonly IJwtService _jwtService;
 
     public BasketController(ICacheHelper cacheHelper, IProductRepository productRepository,
-        ICachedBasketService cachedBasketService)
+        ICachedBasketService cachedBasketService, IJwtService jwtService)
     {
         _productRepository = productRepository;
         _cachedBasketService = cachedBasketService;
+        _jwtService = jwtService;
     }
 
 
@@ -31,10 +37,17 @@ public class BasketController : ControllerBase
     /// </summary>
     /// <returns> Guid of new cachedBasket</returns>
     [HttpPost]
-    public async Task<ActionResult<Guid>> CreateCachedBasket()
+    public async Task<ActionResult> CreateCachedBasket()
     {
-        var id = await _cachedBasketService.CreateCachedBasketAsync();
-        return Ok(id);
+        var jwtObject = _jwtService.GetJwtObjectFromHttpContext(HttpContext);
+
+        var noBasket = !await _cachedBasketService.HasAnyByIdAsync(jwtObject.Id);
+
+        if (!noBasket)
+            return BadRequest("This User Already Has One Basket.");
+
+        var id = await _cachedBasketService.CreateCachedBasketAsync(jwtObject.Id);
+        return Ok();
     }
 
 
@@ -179,7 +192,7 @@ public class BasketController : ControllerBase
 
         if (!cachedBasket.CachedProducts.Any())
         {
-            await _cachedBasketService.DeleteCachedBasket(cachedBasket.Id);
+            await _cachedBasketService.DeleteCachedBasket(cachedBasket.UserId);
             return Ok();
         }
 

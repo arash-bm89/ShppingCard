@@ -38,7 +38,7 @@ public class ProductController : BaseController
     [HttpGet("{id:guid}")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
-    public async Task<ActionResult<ProductResponse>> Get(Guid id)
+    public async Task<ActionResult<ProductResponse>> Get([FromRoute] Guid id)
     {
         var product = await _productRepository.GetAsync(id, HttpContext.RequestAborted);
 
@@ -56,7 +56,7 @@ public class ProductController : BaseController
     [HttpPost]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
-    public async Task<ActionResult<ProductResponse>> Create(ProductRequest productRequest)
+    public async Task<ActionResult<ProductResponse>> Create([FromBody] ProductRequest productRequest)
     {
         if (productRequest.Price == 0 || productRequest.Stock == 0) return BadRequest("Price or stock can not be 0.");
 
@@ -72,6 +72,7 @@ public class ProductController : BaseController
     }
 
 
+
     /// <summary>
     ///     update a product
     /// </summary>
@@ -80,7 +81,7 @@ public class ProductController : BaseController
     /// <returns></returns>
     [HttpPut("{id:guid}")]
     [ProducesResponseType(StatusCodes.Status200OK)]
-    public async Task<ActionResult<ProductResponse>> Update(Guid id, ProductRequest productRequest)
+    public async Task<ActionResult<ProductResponse>> Update([FromRoute] Guid id, [FromBody] ProductRequest productRequest)
     {
         if (productRequest.Price == 0 || productRequest.Stock == 0) return BadRequest("Price or stock can not be 0.");
         var product = await _productRepository.GetAsync(id, HttpContext.RequestAborted);
@@ -96,6 +97,8 @@ public class ProductController : BaseController
         await _productRepository.UpdateAsync(updatedProduct, HttpContext.RequestAborted);
         return Ok();
     }
+
+
 
     /// <summary>
     ///     making a  product by id
@@ -120,6 +123,7 @@ public class ProductController : BaseController
     }
 
 
+
     /// <summary>
     ///     get products
     /// </summary>
@@ -132,10 +136,10 @@ public class ProductController : BaseController
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<ActionResult<PaginatedResponseResult<ProductResponse>>> GetProducts(
-        int offset = 0,
-        int count = 10,
-        string? name = null,
-        bool? isAvailable = null
+        [FromQuery] int offset = 0,
+        [FromQuery] int count = 10,
+        [FromQuery] string? name = null,
+        [FromQuery] bool? isAvailable = null
     )
     {
         var paginatedProducts = await _productRepository
