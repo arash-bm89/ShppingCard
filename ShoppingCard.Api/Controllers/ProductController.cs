@@ -6,6 +6,7 @@ using ShoppingCard.Api.Models;
 using ShoppingCard.Domain.Filters;
 using ShoppingCard.Domain.Interfaces;
 using ShoppingCard.Domain.Models;
+using ShoppingCard.Service.IServices;
 
 namespace ShoppingCard.Api.Controllers;
 // CHECKED
@@ -19,11 +20,13 @@ public class ProductController : BaseController
 {
     private readonly IMapper _mapper;
     private readonly IProductRepository _productRepository;
+    private readonly IJwtService _jwtService;
 
-    public ProductController(IProductRepository productRepository, IMapper mapper)
+    public ProductController(IProductRepository productRepository, IMapper mapper, IJwtService jwtService)
     {
         _productRepository = productRepository;
         _mapper = mapper;
+        _jwtService = jwtService;
     }
 
 
@@ -135,7 +138,6 @@ public class ProductController : BaseController
         bool? isAvailable = null
     )
     {
-        throw new Exception("this is an error");
         var paginatedProducts = await _productRepository
             .GetListAsync(new ProductFilter
             {

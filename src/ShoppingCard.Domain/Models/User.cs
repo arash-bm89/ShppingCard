@@ -14,6 +14,8 @@ namespace ShoppingCard.Domain.Models
 
         public string Email { get; set; }
 
+        public string HashedPassword { get; set; }
+
         public ICollection<Order> Orders { get; set; }
 
         [NotMapped]

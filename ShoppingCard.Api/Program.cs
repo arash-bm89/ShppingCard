@@ -1,5 +1,6 @@
 using Athena.CacheHelper;
 using Athena.RabbitMQHelper;
+using Microsoft.OpenApi.Models;
 using Newtonsoft.Json;
 using ShoppingCard.Api.Configurations;
 using ShoppingCard.Api.ExtensionMethods;
@@ -22,6 +23,28 @@ builder.Services.AddSwaggerGen(c =>
 {
     var filePath = Path.Combine(AppContext.BaseDirectory, "basket.xml");
     c.IncludeXmlComments(filePath);
+
+    c.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme()
+    {
+        Name = "Authorization",
+        Type = SecuritySchemeType.ApiKey,
+        Scheme = "Bearer",
+        BearerFormat = "JWT",
+        In = ParameterLocation.Header,
+        Description = "JWT Authorization header using Bearer scheme."
+    });
+
+    c.AddSecurityRequirement(new OpenApiSecurityRequirement {
+        {
+            new OpenApiSecurityScheme {
+                Reference = new OpenApiReference {
+                    Type = ReferenceType.SecurityScheme,
+                    Id = "Bearer"
+                }
+            },
+            new string[] {}
+        }
+    });
 });
 
 
@@ -55,6 +78,8 @@ if (app.Environment.IsDevelopment())
 app.UseHttpsRedirection();
 
 app.UseMiddleware<ExceptionHandlingMiddleware>();
+
+app.UseMiddleware<CustomAuthorizationMiddleware>();
 
 app.UseMiddleware<RequestLoggingMiddleware>();
 

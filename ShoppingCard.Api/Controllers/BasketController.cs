@@ -12,6 +12,7 @@ namespace ShoppingCard.Api.Controllers;
 /// </summary>
 [Route("Basket")]
 [ApiController]
+// todo: add user for logic of creating basket in the redis.
 public class BasketController : ControllerBase
 {
     private readonly ICachedBasketService _cachedBasketService;

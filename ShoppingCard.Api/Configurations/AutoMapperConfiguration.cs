@@ -19,5 +19,11 @@ public class AutoMapperConfiguration : Profile
         CreateMap(typeof(PaginatedResult<>), typeof(PaginatedResponseResult<>)).ReverseMap();
         CreateMap<Product, CachedProductDto>();
         CreateMap<CachedBasket, CachedBasketDto>();
+        CreateMap<User, UserCreateRequest>().ReverseMap();
+        CreateMap<User, UserResponse>().ReverseMap();
+        CreateMap<User, UserCreateDto>().ReverseMap();
+        CreateMap<UserCreateRequest, UserCreateDto>();
+        CreateMap<UserLoginRequest, UserLoginDto>();
+        CreateMap<UserCreateDto, UserResponse>();
     }
 }

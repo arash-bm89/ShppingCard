@@ -21,7 +21,9 @@ public static class AddServicesExtensionMethods
     {
         services.AddScoped<IOrderRepository, OrderRepository>();
         services.AddScoped<IProductRepository, ProductRepository>();
+        services.AddScoped<IUserRepository, UserRepository>();
         services.AddScoped<IOrderProductRepository, OrderProductRepository>();
         services.AddScoped<ICachedBasketService, CachedBasketService>();
+        services.AddSingleton<IJwtService, JwtService>();
     }
 }

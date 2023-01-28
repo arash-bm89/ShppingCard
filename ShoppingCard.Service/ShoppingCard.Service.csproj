@@ -7,6 +7,7 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\Athena.AspDotnetHelper\Athena.AspDotnetHelper.csproj" />
     <ProjectReference Include="..\Athena.CacheHelper\Athena.CacheHelper.csproj" />
     <ProjectReference Include="..\ShoppingCard.Repository\ShoppingCard.Repository.csproj" />
   </ItemGroup>
