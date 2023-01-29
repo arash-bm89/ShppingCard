@@ -49,7 +49,7 @@
 		</member>
 		<member name="M:ShoppingCard.Api.Controllers.BasketController.DeleteBasketProduct(System.Guid,System.Guid)">
 			<summary>
-				get products of a basket
+				get Products of a basket
 			</summary>
 			<param name="id"></param>
 			<param name="basketProductId"></param>
@@ -62,7 +62,7 @@
 		</member>
 		<member name="T:ShoppingCard.Api.Controllers.CacheBasketController">
 			<summary>
-				cacheBasket is the temporary template using for crud operation on the products that user want to buy
+				cacheBasket is the temporary template using for crud operation on the Products that user want to buy
 			</summary>
 		</member>
 		<member name="M:ShoppingCard.Api.Controllers.CacheBasketController.CreateCachedBasket">
@@ -106,7 +106,7 @@
 		</member>
 		<member name="T:ShoppingCard.Api.Controllers.ProductController">
 			<summary>
-				actions of products in the database
+				actions of Products in the database
 			</summary>
 		</member>
 		<member name="M:ShoppingCard.Api.Controllers.ProductController.Get(System.Guid)">

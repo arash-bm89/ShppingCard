@@ -23,7 +23,7 @@ public class Product : ModelBase
     [MaxLength(300)] public string? Description { get; set; }
 
     /// <summary>
-    ///     number of available products
+    ///     number of available Products
     /// </summary>
     [Required]
     public uint Stock { get; set; }

@@ -11,7 +11,7 @@ public struct OrderProductFilter : IListFilter
     public Guid[]? ProductIds { get; set; }
 
     /// <summary>
-    ///     this is going to use for /orders/{id}/products/list and we gonna use this field to find orderProducts for this
+    ///     this is going to use for /orders/{id}/Products/list and we gonna use this field to find orderProducts for this
     ///     basketId
     /// </summary>
     public Guid? OrderId { get; set; }

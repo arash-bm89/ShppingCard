@@ -7,24 +7,23 @@ using ShoppingCard.Service.IServices;
 
 namespace ShoppingCard.Api.Controllers;
 
-// todo: add fromQuery and... to the actions
 // todo: add "" from some notFound or badRequest responses
-// todo: add logic of user support
 
 /// <summary>
-///     cacheBasket is the temporary template using for crud operation on the products that user want to buy
+///     cacheBasket is the temporary template using for crud operation on the Products that user want to buy
 /// </summary>
-[Route("Basket")]
+[Route("user/basket")]
 [ApiController]
-// todo: add user for logic of creating basket in the redis.
 public class BasketController : ControllerBase
 {
     private readonly ICachedBasketService _cachedBasketService;
     private readonly IProductRepository _productRepository;
     private readonly IJwtService _jwtService;
 
-    public BasketController(ICacheHelper cacheHelper, IProductRepository productRepository,
-        ICachedBasketService cachedBasketService, IJwtService jwtService)
+    public BasketController(ICacheHelper cacheHelper,
+        IProductRepository productRepository,
+        ICachedBasketService cachedBasketService,
+        IJwtService jwtService)
     {
         _productRepository = productRepository;
         _cachedBasketService = cachedBasketService;
@@ -37,18 +36,21 @@ public class BasketController : ControllerBase
     /// </summary>
     /// <returns> Guid of new cachedBasket</returns>
     [HttpPost]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
     public async Task<ActionResult> CreateCachedBasket()
     {
-        var jwtObject = _jwtService.GetJwtObjectFromHttpContext(HttpContext);
+        var userId = _jwtService.GetJwtObjectFromHttpContext(HttpContext).Id;
 
-        var noBasket = !await _cachedBasketService.HasAnyByIdAsync(jwtObject.Id);
+        var noBasket = !await _cachedBasketService.HasAnyByIdAsync(userId);
 
         if (!noBasket)
             return BadRequest("This User Already Has One Basket.");
 
-        var id = await _cachedBasketService.CreateCachedBasketAsync(jwtObject.Id);
+        await _cachedBasketService.CreateCachedBasketAsync(userId);
         return Ok();
     }
+
 
 
     /// <summary>
@@ -56,15 +58,18 @@ public class BasketController : ControllerBase
     /// </summary>
     /// <param name="id"></param>
     /// <returns></returns>
-    [HttpGet("{id:guid}")]
+    [HttpGet]
+    [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
-    public async Task<ActionResult<CachedBasketDto>> GetCachedBasket([FromRoute] Guid id)
+    public async Task<ActionResult<CachedBasketDto>> GetCachedBasket()
     {
-        var cachedBasket = await _cachedBasketService.GetCachedBasketByIdAsync(id);
+        var userId = _jwtService.GetJwtObjectFromHttpContext(HttpContext).Id;
+
+        var cachedBasket = await _cachedBasketService.GetCachedBasketByIdAsync(userId);
 
         // checking if cachedBasket is available or not.
         if (cachedBasket == null)
-            return NotFound("Cached Order Not Found");
+            return NotFound("Basket Not Found");
 
         var cachedBasketDto = await _cachedBasketService
             .GetProductsFromRepositoryAsync(cachedBasket, HttpContext.RequestAborted);
@@ -72,33 +77,6 @@ public class BasketController : ControllerBase
         return Ok(cachedBasketDto);
     }
 
-
-    /// <summary>
-    ///     get Product of a Basket
-    /// </summary>
-    /// <param name="id"></param>
-    /// <param name="productId"></param>
-    /// <returns></returns>
-    [HttpGet("{id:guid}/products/{productId:guid}")]
-    public async Task<ActionResult<CachedProduct>> GetCachedProduct(
-        [FromRoute] Guid id,
-        [FromRoute] Guid productId)
-    {
-        var cachedBasket = await _cachedBasketService
-            .GetCachedBasketByIdAsync(id);
-
-        if (cachedBasket == null) return NotFound("Cached Order Not Found");
-
-        var cachedProduct = _cachedBasketService.GetCachedProductByCachedBasket(cachedBasket, productId);
-
-        if (cachedProduct == null) return NotFound("Product Not Found In The Cache Of Order");
-
-        var cachedProductDto = await _cachedBasketService
-            .GetProductFromRepositoryAsync(cachedProduct, HttpContext.RequestAborted);
-
-
-        return Ok(cachedProductDto);
-    }
 
 
     /// <summary>
@@ -108,17 +86,23 @@ public class BasketController : ControllerBase
     /// <param name="productId"></param>
     /// <param name="count">null means it will be increased by one and 0 will redirected to DeleteAction</param>
     /// <returns></returns>
-    [HttpPost("{id:guid}/products/{productId:guid}/")]
+    [HttpPost("Products/{productId:guid}/")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<IActionResult> UpdateProductInBasketCache(
-        [FromRoute] Guid id,
         [FromRoute] Guid productId,
         [FromQuery] uint? count = null)
     {
-        if (count == 0) return RedirectToAction("DeleteProduct", new { id, productId });
-        var cachedBasket = await _cachedBasketService.GetCachedBasketByIdAsync(id);
+        var userId = _jwtService.GetJwtObjectFromHttpContext(HttpContext).Id;
+
+        // if count of product going to be 0, then the logic is handled in DeleteProduct action
+        if (count == 0) return RedirectToAction("DeleteProduct", new { userId, productId });
+
+        var cachedBasket = await _cachedBasketService.GetCachedBasketByIdAsync(userId);
 
         // checking if cachedBasket is available or not.
-        if (cachedBasket == null) return NotFound("Cached Order Not Found");
+        if (cachedBasket == null) return NotFound("Basket Not Found");
 
         var dbProduct =
             await _productRepository.GetAsync(productId, HttpContext.RequestAborted);
@@ -161,9 +145,41 @@ public class BasketController : ControllerBase
                     (uint)count);
         }
 
-        await _cachedBasketService.StoreAsync(id, cachedBasket);
+        await _cachedBasketService.StoreAsync(userId, cachedBasket);
         return Ok();
     }
+
+
+
+    /// <summary>
+    ///     get Product of a Basket
+    /// </summary>
+    /// <param name="id"></param>
+    /// <param name="productId"></param>
+    /// <returns></returns>
+    [HttpGet("Products/{productId:guid}")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    public async Task<ActionResult<CachedProduct>> GetCachedProduct(
+        [FromRoute] Guid productId)
+    {
+        var userId = _jwtService.GetJwtObjectFromHttpContext(HttpContext).Id;
+        var cachedBasket = await _cachedBasketService
+            .GetCachedBasketByIdAsync(userId);
+
+        if (cachedBasket == null) return NotFound("Basket Not Found");
+
+        var cachedProduct = _cachedBasketService.GetCachedProductByCachedBasket(cachedBasket, productId);
+
+        if (cachedProduct == null) return NotFound("Product Not Found In The Basket");
+
+        var cachedProductDto = await _cachedBasketService
+            .GetProductFromRepositoryAsync(cachedProduct, HttpContext.RequestAborted);
+
+
+        return Ok(cachedProductDto);
+    }
+
 
 
     /// <summary>
@@ -172,21 +188,22 @@ public class BasketController : ControllerBase
     /// <param name="id"></param>
     /// <param name="productId"></param>
     /// <returns></returns>
-    [ActionName("DeleteProduct")]
-    [HttpDelete("{id:guid}/products/{productId}", Name = "DeleteProduct")]
+    [HttpDelete("Products/{productId:guid}", Name = "DeleteProduct")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<IActionResult> DeleteCacheProduct(
-        [FromRoute] Guid id,
         [FromRoute] Guid productId)
     {
-        var cachedBasket = await _cachedBasketService.GetCachedBasketByIdAsync(id);
+        var userId = _jwtService.GetJwtObjectFromHttpContext(HttpContext).Id;
+        var cachedBasket = await _cachedBasketService.GetCachedBasketByIdAsync(userId);
 
         if (cachedBasket == null)
-            return NotFound("Cached Order Not Found");
+            return NotFound("Basket Not Found");
 
         var product = _cachedBasketService.GetCachedProductByCachedBasket(cachedBasket, productId);
 
         if (product == null)
-            return NotFound("Product Not Found In The Cache Of Order");
+            return NotFound("Product Not Found In The Basket");
 
         _cachedBasketService.DeleteCachedProductInBasket(cachedBasket, product);
 
@@ -196,7 +213,7 @@ public class BasketController : ControllerBase
             return Ok();
         }
 
-        await _cachedBasketService.StoreAsync(id, cachedBasket);
+        await _cachedBasketService.StoreAsync(userId, cachedBasket);
         return Ok();
     }
 }

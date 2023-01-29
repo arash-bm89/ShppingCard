@@ -8,6 +8,7 @@ using EasyNetQ;
 
 namespace Athena.RabbitMQHelper;
 
+// todo: implement can connect
 public class AsyncJobProducer<TMessage> : IAsyncJobProducer<TMessage>
     where TMessage : Message, new()
 {

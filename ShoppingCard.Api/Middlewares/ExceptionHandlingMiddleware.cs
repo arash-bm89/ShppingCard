@@ -30,7 +30,6 @@ public class ExceptionHandlingMiddleware
         catch (Exception e)
         {
             // logging exception in the logger
-            // todo: add serilog to the project
             _logger.LogCritical(e, e.Message);
 
             // generating internalServerError in response.body

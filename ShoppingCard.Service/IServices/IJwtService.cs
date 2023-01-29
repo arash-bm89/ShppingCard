@@ -10,7 +10,7 @@ namespace ShoppingCard.Service.IServices;
 
 public interface IJwtService
 {
-    string CreateJwt(Guid id, string name, string key);
+    string CreateJwt(Guid id, string key);
 
     bool ValidateJwt(string token, string key);
 

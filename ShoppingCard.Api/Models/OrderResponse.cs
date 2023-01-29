@@ -4,6 +4,7 @@ namespace ShoppingCard.Api.Models;
 
 public class OrderResponse
 {
+    public Guid Id { get; set; }
     public ICollection<Payment>? Payments { get; set; }
 
     public ICollection<OrderProductResponse> Products { get; set; }

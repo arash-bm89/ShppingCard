@@ -10,10 +10,9 @@ public class CacheHelper : ICacheHelper
     private readonly IDatabase _db;
     private readonly ILogger<CacheHelper> _logger;
 
-    public CacheHelper(IDatabase db, IOptions<CacheConfiguration> options, ILogger<CacheHelper> logger)
+    public CacheHelper(IDatabase db, ILogger<CacheHelper> logger)
     {
         _db = db;
-        _options = options;
         _logger = logger;
     }
 
@@ -23,13 +22,11 @@ public class CacheHelper : ICacheHelper
     {
         try
         {
-            var finalKey = $"{_options.Value.Prefix} - {key}";
-
             var valueString = JsonConvert.SerializeObject(value, Formatting.Indented, new JsonSerializerSettings
             {
                 ReferenceLoopHandling = ReferenceLoopHandling.Ignore
             });
-            await _db.StringSetAsync(finalKey, valueString, expiration);
+            await _db.StringSetAsync(key, valueString, expiration);
         }
         catch (Exception e)
         {
@@ -42,9 +39,7 @@ public class CacheHelper : ICacheHelper
     {
         try
         {
-            var finalKey = $"{_options.Value.Prefix} - {key}";
-
-            var value = await _db.StringGetAsync(finalKey);
+            var value = await _db.StringGetAsync(key);
 
             if (value.IsNull || !value.HasValue)
                 return default;
@@ -63,11 +58,9 @@ public class CacheHelper : ICacheHelper
 
     public async Task RemoveAsync(string key, TimeSpan? removeAt = null)
     {
-        var finalKey = $"{_options.Value.Prefix} - {key}";
-
         if (removeAt.HasValue)
-            await _db.KeyExpireAsync(finalKey, removeAt);
+            await _db.KeyExpireAsync(key, removeAt);
         else
-            await _db.KeyDeleteAsync(finalKey);
+            await _db.KeyDeleteAsync(key);
     }
 }

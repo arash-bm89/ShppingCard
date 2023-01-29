@@ -1,5 +1,6 @@
 ﻿using Athena.CacheHelper;
 using AutoMapper;
+using Microsoft.EntityFrameworkCore.Metadata.Internal;
 using ShoppingCard.Api.Models;
 using ShoppingCard.Domain.Dtos;
 using ShoppingCard.Domain.Filters;
@@ -14,21 +15,20 @@ public class CachedBasketService : ICachedBasketService
     private readonly IMapper _mapper;
     private readonly ICacheHelper _cacheHelper;
     private readonly IProductRepository _productRepository;
+    private readonly string _prefix = "basket_cache";
 
-    // todo: should i store the product after adding or removing anything from it.
     public CachedBasketService(ICacheHelper cacheHelper, IProductRepository productRepository, IMapper mapper)
     {
         _cacheHelper = cacheHelper;
         _productRepository = productRepository;
         _mapper = mapper;
-        _cacheHelper._options.Value.Prefix = "basket_cache";
     }
 
 
     public async Task<CachedBasket?> GetCachedBasketByIdAsync(Guid basketId)
     {
         var key = basketId.ToString();
-        return await _cacheHelper.FetchAsync<CachedBasket>(key);
+        return await _cacheHelper.FetchAsync<CachedBasket>($"{_prefix} - {key}");
     }
 
     public CachedProduct? GetCachedProductByCachedBasket(CachedBasket basket, Guid productId)
@@ -48,7 +48,7 @@ public class CachedBasketService : ICachedBasketService
         if (!basket.CachedProducts.Any())
             return new CachedBasketDto
             {
-                BasketId = basket.UserId,
+                UserId = basket.UserId,
                 Products = new List<CachedProductDto>()
             };
 
@@ -61,7 +61,7 @@ public class CachedBasketService : ICachedBasketService
 
         var cachedBasketDto = new CachedBasketDto { };
 
-        cachedBasketDto.BasketId = basket.UserId;
+        cachedBasketDto.UserId = basket.UserId;
 
         if (products.Items == null || !products.Items.Any())
             return cachedBasketDto;
@@ -91,7 +91,7 @@ public class CachedBasketService : ICachedBasketService
     public async Task StoreAsync(Guid id, CachedBasket basket)
     {
         var key = id.ToString();
-        await _cacheHelper.StoreAsync(key, basket);
+        await _cacheHelper.StoreAsync($"{_prefix} - {key}", basket);
     }
 
 
@@ -108,7 +108,7 @@ public class CachedBasketService : ICachedBasketService
     public async Task DeleteCachedBasket(Guid basketId)
     {
         var key = basketId.ToString();
-        await _cacheHelper.RemoveAsync(key);
+        await _cacheHelper.RemoveAsync($"{_prefix} - {key}");
     }
 
     public void ApplyCountInCachedProduct(CachedProduct product, uint count)
@@ -125,14 +125,15 @@ public class CachedBasketService : ICachedBasketService
     {
         var key = userId.ToString();
 
-        await _cacheHelper.StoreAsync(key, new CachedBasket { UserId = userId });
+        await _cacheHelper.StoreAsync($"{_prefix} - {key}", new CachedBasket { UserId = userId });
 
         return userId;
     }
 
     public async Task<bool> HasAnyByIdAsync(Guid id)
     {
-        var basket = await _cacheHelper.FetchAsync<CachedBasket>(id.ToString());
+        var key = id.ToString();
+        var basket = await _cacheHelper.FetchAsync<CachedBasket>($"{_prefix} - {key}");
         return basket != null;
     }
 }

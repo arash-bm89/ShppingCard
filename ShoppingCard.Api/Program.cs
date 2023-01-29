@@ -5,10 +5,8 @@ using Newtonsoft.Json;
 using ShoppingCard.Api.Configurations;
 using ShoppingCard.Api.ExtensionMethods;
 using ShoppingCard.Api.Middlewares;
-using ShoppingCard.Service.IServices;
+using Swashbuckle.AspNetCore.SwaggerUI;
 
-// todo: implement exceptionMiddleware
-// todo: implement actionFilters
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -16,7 +14,10 @@ var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddControllers()
     .AddNewtonsoftJson(options =>
-        options.SerializerSettings.ReferenceLoopHandling = ReferenceLoopHandling.Ignore);
+        {
+            options.SerializerSettings.ReferenceLoopHandling = ReferenceLoopHandling.Ignore;
+        });
+
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(c =>
@@ -48,6 +49,7 @@ builder.Services.AddSwaggerGen(c =>
             new string[] { }
         }
     });
+
 });
 
 
@@ -75,7 +77,13 @@ var app = builder.Build();
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
-    app.UseSwaggerUI();
+    app.UseSwaggerUI(c =>
+    {
+        c.Interceptors = new InterceptorFunctions
+        {
+            RequestInterceptorFunction = "function (req) { req.headers['Authorization'] = 'bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJJZCI6IjZhYzlkOGNlLTg4M2MtNGM5YS1iNGMxLTllNjFlZmI0NjFiYyIsIk5hbWUiOiJhcmFzaCJ9.dlZa17YaHjCwYyWSBpyeRj8BP969H5zqHdLFyQ/F+Z0'; return req; }"
+        };
+    });
 }
 
 app.UseHttpsRedirection();

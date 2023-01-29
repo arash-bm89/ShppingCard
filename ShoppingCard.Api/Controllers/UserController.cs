@@ -1,6 +1,4 @@
-﻿using Athena.AspDotnetHelper;
-using AutoMapper;
-using Microsoft.AspNetCore.Http;
+﻿using AutoMapper;
 using Microsoft.AspNetCore.Mvc;
 using ShoppingCard.Api.Models;
 using ShoppingCard.Domain.Dtos;
@@ -100,13 +98,14 @@ public class UserController : ControllerBase
 
         if (!isNamePasswordValid)
             return NotFound("Name or Password is wrong.");
-        // todo: ask how should i implement repo methods to get user in this section
 
         var user = await _userRepository.GetByNameAsync(userLoginDto.Name);
+
         var loginResponse = new LoginResponse()
         {
-            Token = _jwtService.CreateJwt(user.Id, user.Name, _jwtKey)
+            Token = _jwtService.CreateJwt(user.Id, _jwtKey)
         };
+
         return Ok(loginResponse);
     }
 }

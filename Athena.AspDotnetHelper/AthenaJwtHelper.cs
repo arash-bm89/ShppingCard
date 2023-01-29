@@ -1,12 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Security.Cryptography;
+﻿using System.Security.Cryptography;
 using System.Text;
-using System.Threading.Tasks;
-using System.Xml;
 using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
 using Formatting = Newtonsoft.Json.Formatting;
 
 namespace Athena.AspDotnetHelper;
@@ -74,7 +68,6 @@ public static class AthenaJwtHelper
 
     private static bool ValidateJwt(string token, byte[] keyBytes)
     {
-        // todo: this has some bugs in validating token
         try
         {
             var parts = token.Split('.');

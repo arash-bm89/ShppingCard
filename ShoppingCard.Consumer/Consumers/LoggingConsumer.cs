@@ -31,6 +31,10 @@ public class LoggingConsumer : BaseAsyncJobConsumer<LogMessage>
 
         var log = JsonConvert.SerializeObject(message, Formatting.None);
 
+        if (message.HasException)
+        {
+
+        }
         _logger
             .LogInformation
                 ($"{DateTime.UtcNow}  IP={message.Ip}  HttpMethod={message.HttpMethod}  StatusCode={message.StatusCode}  Body={message.Body}  HasException={message.HasException}  Exception={message.ErrorMessage}");

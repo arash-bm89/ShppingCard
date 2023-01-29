@@ -17,7 +17,7 @@ public class OrderProduct : ModelBase
     public uint Count { get; set; }
 
     /// <summary>
-    ///     price of all products of this type in a order
+    ///     price of all Products of this type in a order
     /// </summary>
     public decimal TotalPrice { get; set; }
 }

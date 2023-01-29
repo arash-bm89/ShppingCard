@@ -5,7 +5,7 @@
 /// </summary>
 public class CachedBasketDto
 {
-    public Guid BasketId { get; set; }
+    public Guid UserId { get; set; }
 
     public ICollection<CachedProductDto> Products { get; set; } = new List<CachedProductDto>();
 

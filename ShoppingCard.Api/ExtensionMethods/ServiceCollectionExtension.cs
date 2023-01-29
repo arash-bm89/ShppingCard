@@ -7,7 +7,7 @@ using ShoppingCard.Service.Services;
 
 namespace ShoppingCard.Api.ExtensionMethods;
 
-public static class AddServicesExtensionMethods
+public static class ServiceCollectionExtension
 {
     public static void AddApplicationDbContext(this IServiceCollection services, IConfiguration configuration)
     {

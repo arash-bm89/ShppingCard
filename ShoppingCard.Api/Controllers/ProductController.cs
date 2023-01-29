@@ -12,10 +12,10 @@ namespace ShoppingCard.Api.Controllers;
 // CHECKED
 
 /// <summary>
-///     actions of products in the database
+///     actions of Products in the database
 /// </summary>
 [ApiController]
-[Route("products")]
+[Route("Products")]
 public class ProductController : BaseController
 {
     private readonly IMapper _mapper;
@@ -84,6 +84,7 @@ public class ProductController : BaseController
     public async Task<ActionResult<ProductResponse>> Update([FromRoute] Guid id, [FromBody] ProductRequest productRequest)
     {
         if (productRequest.Price == 0 || productRequest.Stock == 0) return BadRequest("Price or stock can not be 0.");
+
         var product = await _productRepository.GetAsync(id, HttpContext.RequestAborted);
 
         if (product == null) return NotFound($"product with id: {id} not found");
@@ -93,8 +94,11 @@ public class ProductController : BaseController
             return BadRequest($"Product with the name: {productRequest.Name} is already available");
 
         var updatedProduct = _mapper.Map<ProductRequest, Product>(productRequest);
+
         product.SetBaseModelPropsToRequest(updatedProduct);
+
         await _productRepository.UpdateAsync(updatedProduct, HttpContext.RequestAborted);
+
         return Ok();
     }
 
@@ -125,14 +129,14 @@ public class ProductController : BaseController
 
 
     /// <summary>
-    ///     get products
+    ///     get Products
     /// </summary>
     /// <param name="offset"></param>
     /// <param name="count"></param>
     /// <param name="name"></param>
     /// <param name="isAvailable"></param>
     /// <returns></returns>
-    [HttpGet("")]
+    [HttpGet]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<ActionResult<PaginatedResponseResult<ProductResponse>>> GetProducts(
@@ -152,7 +156,7 @@ public class ProductController : BaseController
             }, HttpContext.RequestAborted);
 
         if (!paginatedProducts.HasAnyItems())
-            return NotFound("No products found");
+            return NotFound("No Products found");
 
 
         var paginatedProductsResponse =

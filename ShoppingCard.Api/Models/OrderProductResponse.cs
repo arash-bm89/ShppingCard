@@ -4,8 +4,6 @@ namespace ShoppingCard.Api.Models;
 
 public class OrderProductResponse
 {
-    public Guid OrderId { get; set; }
-
     public Guid ProductId { get; set; }
 
     public ProductResponse Product { get; set; }
@@ -17,7 +15,7 @@ public class OrderProductResponse
     public uint Count { get; set; }
 
     /// <summary>
-    ///     price of all products of this type in a basket
+    ///     price of all Products of this type in a basket
     /// </summary>
     public decimal TotalPrice { get; set; }
 }

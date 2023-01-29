@@ -13,12 +13,11 @@ namespace ShoppingCard.Service.Services;
 
 public class JwtService : IJwtService
 {
-    public string CreateJwt(Guid id, string name, string key)
+    public string CreateJwt(Guid id, string key)
     {
         var jwtObject = new JwtObject()
         {
             Id = id,
-            Name = name
         };
 
         return AthenaJwtHelper.CreateJwt(jwtObject, key);

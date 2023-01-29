@@ -23,7 +23,7 @@ public class CustomAuthorizationMiddleware
         var path = context.Request.Path.Value
             .Split("/");
 
-        if (path[1] == "user")
+        if (path[1] == "user" && (path.Length == 2 || (path[2] != "basket" && path[2] != "orders")))
         {
             await _next.Invoke(context);
             return;
@@ -54,7 +54,6 @@ public class CustomAuthorizationMiddleware
             return;
         }
 
-        // todo: add jwtObject to the header
         var tokenPayload = token.Split('.')[1];
         context.Request.Headers.Add("token-payload", tokenPayload);
 
