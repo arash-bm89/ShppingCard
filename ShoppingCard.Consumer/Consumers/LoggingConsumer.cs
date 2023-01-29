@@ -14,31 +14,23 @@ namespace ShoppingCard.Consumer.Consumers;
 public class LoggingConsumer : BaseAsyncJobConsumer<LogMessage>
 {
     private readonly ILogger<LoggingConsumer> _logger;
+    private readonly ApplicationDbContext _db;
 
     public LoggingConsumer(ILogger<LoggingConsumer> logger,
         IBus bus,
+        ApplicationDbContext db,
         string subscriptionId = "",
         string routingKey = "#",
         ushort prefetchCount = 10)
         : base(logger, bus, subscriptionId, routingKey, prefetchCount)
     {
         _logger = logger;
+        _db = db;
     }
 
     public override async Task OnMessage(LogMessage message, CancellationToken cancellationToken)
     {
-        message.Body = JsonConvert.SerializeObject(message.Body, Formatting.None);
-
-        var log = JsonConvert.SerializeObject(message, Formatting.None);
-
-        if (message.HasException)
-        {
-
-        }
-        _logger
-            .LogInformation
-                ($"{DateTime.UtcNow}  IP={message.Ip}  HttpMethod={message.HttpMethod}  StatusCode={message.StatusCode}  Body={message.Body}  HasException={message.HasException}  Exception={message.ErrorMessage}");
-
-        await Task.CompletedTask;
+        await _db.LogMessages.AddAsync(message, cancellationToken);
+        await _db.SaveChangesAsync(cancellationToken);
     }
 }

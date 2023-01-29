@@ -17,4 +17,6 @@ public interface IUserRepository : IBaseRepository<User, UserFilter>
     Task<bool> IsNamePasswordValid(UserLoginDto userLoginDto, CancellationToken cancellationToken);
 
     Task<User?> GetByNameAsync(string name);
+
+    Task<List<User>?> GetAllAsync(CancellationToken cancellationToken);
 }

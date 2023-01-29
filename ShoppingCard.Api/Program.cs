@@ -1,5 +1,6 @@
 using Athena.CacheHelper;
 using Athena.RabbitMQHelper;
+using Hangfire;
 using Microsoft.OpenApi.Models;
 using Newtonsoft.Json;
 using ShoppingCard.Api.Configurations;
@@ -52,6 +53,11 @@ builder.Services.AddSwaggerGen(c =>
 
 });
 
+// Add Hangfire Services
+builder.Services.AddHangfireServices(builder.Configuration);
+
+// Add Hangfire Server
+builder.Services.AddHangfireServer();
 
 // Add DbContext to the application
 builder.Services.AddApplicationDbContext(builder.Configuration);
@@ -88,6 +94,8 @@ if (app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 
+app.UseHangfireDashboard();
+
 app.UseMiddleware<ExceptionHandlingMiddleware>();
 
 app.UseMiddleware<CustomAuthorizationMiddleware>();
@@ -97,5 +105,7 @@ app.UseMiddleware<RequestLoggingMiddleware>();
 app.UseAuthorization();
 
 app.MapControllers();
+
+app.MapHangfireDashboard();
 
 app.Run();

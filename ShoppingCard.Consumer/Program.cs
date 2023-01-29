@@ -1,5 +1,6 @@
 using Athena.RabbitMQHelper;
 using EasyNetQ;
+using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json;
 using Serilog;
 using Serilog.Core;
@@ -24,8 +25,10 @@ var host = Host.CreateDefaultBuilder(args)
     })
     .ConfigureServices((context, services) =>
     {
-        var serviceProvider = services.BuildServiceProvider();
-        var logger = serviceProvider.GetService<ILogger>();
+        services.AddDbContext<ApplicationDbContext>(options =>
+        {
+            options.UseNpgsql(context.Configuration.GetConnectionString("basketDb"));
+        });
         services.AddRabbit(context.Configuration.GetSection("Rabbit"));
         services.AddSingleton<IAsyncJobConsumer<LogMessage>, LoggingConsumer>();
         services.AddHostedService<LoggingConsumerHost>();

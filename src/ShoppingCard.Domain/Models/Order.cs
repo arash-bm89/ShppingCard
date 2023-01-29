@@ -11,7 +11,7 @@ public class Order : ModelBase
     ///     using for the confirmed payment for the order
     /// </summary>
     [NotMapped]
-    public Payment? ConfirmedPayment => Payments?.Single(x => x.IsConfirmed);
+    public Payment? ConfirmedPayment => Payments?.SingleOrDefault(x => x.IsConfirmed);
 
 
     /// <summary>

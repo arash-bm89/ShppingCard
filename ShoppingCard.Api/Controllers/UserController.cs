@@ -1,31 +1,37 @@
 ﻿using AutoMapper;
+using Hangfire;
 using Microsoft.AspNetCore.Mvc;
+using ShoppingCard.Api.Filters;
 using ShoppingCard.Api.Models;
 using ShoppingCard.Domain.Dtos;
 using ShoppingCard.Domain.Interfaces;
 using ShoppingCard.Domain.Models;
 using ShoppingCard.Service.IServices;
+using ShoppingCard.Api.HangfireJobs;
 
 namespace ShoppingCard.Api.Controllers;
 
 [Route("user")]
 [ApiController]
-public class UserController : ControllerBase
+public class UserController : BaseController
 {
     private readonly string _jwtKey;
     private readonly IUserRepository _userRepository;
     private readonly IMapper _mapper;
     private readonly IJwtService _jwtService;
+    private readonly IBackgroundJobClient _backgroundJobClient;
 
     public UserController(
         IUserRepository userRepository,
         IMapper mapper,
         IConfiguration configuration,
-        IJwtService jwtService)
+        IJwtService jwtService,
+        IBackgroundJobClient backgroundJobClient)
     {
         _userRepository = userRepository;
         _mapper = mapper;
         _jwtService = jwtService;
+        _backgroundJobClient = backgroundJobClient;
         _jwtKey = configuration.GetSection("keys").GetValue<string>("jwtKey");
     }
 
@@ -55,6 +61,10 @@ public class UserController : ControllerBase
         userDto.Id = Guid.NewGuid();
         await _userRepository.CreateAsync(userDto, HttpContext.RequestAborted);
 
+        //_backgroundJobClient.Enqueue(() => Job.SayHelloJob(userDto.Name));
+
+        // create a delayed background job
+        _backgroundJobClient.Schedule(() => Job.SayHelloJob(userDto.Name), TimeSpan.FromMinutes(3));
 
         var userResponse = _mapper.Map<UserCreateDto, UserResponse>(userDto);
 
@@ -107,5 +117,19 @@ public class UserController : ControllerBase
         };
 
         return Ok(loginResponse);
+    }
+
+    /// <summary>
+    /// get all users
+    /// </summary>
+    /// <returns></returns>
+    [AdminPrivilageActionFilter("admin")] // get Secret key from value and check it with the adminSecret parameter 
+    [HttpGet]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+    public async Task<ActionResult<List<User>?>> GetAll()
+    {
+        var list = await _userRepository.GetAllAsync(HttpContext.RequestAborted);
+        return Ok(list);
     }
 }
